@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "203942226558",
+    "project_id": "ece452-watufound",
+    "storage_bucket": "ece452-watufound.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:203942226558:android:2c75e8ee542f049a4bc62f",
+        "android_client_info": {
+          "package_name": "com.ece452.watufound"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAq5RVGDlWrKbAvuJ13dexaKsPOnCESyNk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
