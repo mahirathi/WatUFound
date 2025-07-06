@@ -12,10 +12,11 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_post"
-        android:name="com.ece452.watufound.ui.customForm.CustomFormFragment"
+        android:id="@+id/navigation_lost"
+        android:name="com.ece452.watufound.ui.lostForm.LostFormFragment"
         android:label="Post"
-        tools:layout="@layout/fragment_custom_form" />
+        tools:layout="@layout/fragment_lost_form" />
+
     <fragment
         android:id="@+id/navigation_messages"
         android:name="com.ece452.watufound.ui.notifications.NotificationsFragment"

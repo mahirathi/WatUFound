@@ -24,7 +24,7 @@ object BottomNavManager {
         val appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.navigation_feed,
-                R.id.navigation_post,
+                R.id.navigation_lost,
                 R.id.navigation_messages,
                 R.id.navigation_profile,
                 R.id.navigation_custom
