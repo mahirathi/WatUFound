@@ -13,10 +13,9 @@
 
     <fragment
         android:id="@+id/navigation_post"
-        android:name="com.ece452.watufound.ui.dashboard.DashboardFragment"
+        android:name="com.ece452.watufound.ui.customForm.CustomFormFragment"
         android:label="Post"
-        tools:layout="@layout/fragment_dashboard" />
-
+        tools:layout="@layout/fragment_custom_form" />
     <fragment
         android:id="@+id/navigation_messages"
         android:name="com.ece452.watufound.ui.notifications.NotificationsFragment"
