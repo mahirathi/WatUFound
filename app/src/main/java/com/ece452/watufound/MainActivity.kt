@@ -45,12 +45,14 @@ class MainActivity : AppCompatActivity() {
     private val db = Firebase.firestore
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val auth = FirebaseAuth.getInstance()
-//        if (auth.currentUser == null) {
+        if (auth.currentUser == null) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
-//        }
+        }
+
         setContentView(R.layout.activity_main)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

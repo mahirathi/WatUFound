@@ -2,6 +2,7 @@ package com.ece452.watufound.ui.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -21,13 +22,14 @@ class LoginActivity : AppCompatActivity() {
 
         val emailEdit = findViewById<EditText>(R.id.emailEditText)
         val passEdit = findViewById<EditText>(R.id.passwordEditText)
-        val loginBtn = findViewById<Button>(R.id.loginButton)
-        val registerBtn = findViewById<Button>(R.id.registerButton)
+        val loginBtn = findViewById<Button>(R.id.signInButton)
+        val registerBtn = findViewById<Button>(R.id.signUpButton)
 
         loginBtn.setOnClickListener {
             val email = emailEdit.text.toString()
             val password = passEdit.text.toString()
             loginUser(email, password)
+            Log.d("LoginActivity", "Login button clicked")
         }
 
         registerBtn.setOnClickListener {
