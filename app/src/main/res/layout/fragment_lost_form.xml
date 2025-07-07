@@ -1,119 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/purple_500"
     android:padding="24dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
-        <!-- Title -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Report Lost Item"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="8dp" />
-
-        <!-- Subtitle -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Help others help you find your lost item"
-            android:textSize="14sp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="24dp" />
-
-        <!-- Item Title -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Item Title"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp" />
-
-        <EditText
-            android:id="@+id/itemTitleInput"
+        <!-- Card-like container -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:layout_marginBottom="16dp" />
+            android:orientation="vertical"
+            android:background="@android:color/white"
+            android:elevation="8dp"
+            android:padding="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="24dp"
+            android:clipToPadding="false"
+            android:layout_gravity="center">
 
-        <!-- Description -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Description"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp" />
+            <!-- Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Report Lost Item"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="8dp" />
 
-        <EditText
-            android:id="@+id/descriptionInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
-            android:minLines="3"
-            android:gravity="top"
-            android:layout_marginBottom="16dp" />
+            <!-- Subtitle -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Help others help you find your lost item"
+                android:textSize="14sp"
+                android:textColor="#555555"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="24dp" />
 
-        <!-- Category -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Category"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp" />
+            <!-- Item Title -->
+            <TextView
+                style="@style/TextLabel"
+                android:text="Item Title" />
+            <EditText
+                android:id="@+id/itemTitleInput"
+                style="@style/InputField" />
 
-        <Spinner
-            android:id="@+id/categorySpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
+            <!-- Description -->
+            <TextView
+                style="@style/TextLabel"
+                android:text="Description" />
+            <EditText
+                android:id="@+id/descriptionInput"
+                style="@style/InputField"
+                android:inputType="textMultiLine"
+                android:minLines="3"
+                android:gravity="top" />
 
-        <!-- Last Seen At -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Last Seen At"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp" />
+            <!-- Category -->
+            <TextView
+                style="@style/TextLabel"
+                android:text="Category" />
+            <Spinner
+                android:id="@+id/categorySpinner"
+                style="@style/SpinnerField" />
 
-        <Spinner
-            android:id="@+id/lastSeenAtSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
+            <!-- Last Seen At -->
+            <TextView
+                style="@style/TextLabel"
+                android:text="Last Seen At" />
+<!--            <Spinner-->
+<!--                android:id="@+id/lastSeenAtSpinner"-->
+<!--                style="@style/SpinnerField" />-->
+            <AutoCompleteTextView
+                android:id="@+id/lastSeenAtInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Select location"
+                android:inputType="text"
+                android:background="@drawable/input_field_background"
+                android:padding="12dp"
+                android:layout_marginBottom="16dp"
+                android:dropDownHeight="200dp"
+                android:completionThreshold="1" />
 
-        <!-- Date & Time Lost -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Date &amp; Time Lost"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp" />
 
-        <EditText
-            android:id="@+id/dateTimeInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:focusable="false"
-            android:clickable="true"
-            android:inputType="none"
-            android:layout_marginBottom="24dp" />
+            <!-- Date & Time -->
+            <TextView
+                style="@style/TextLabel"
+                android:text="Date and Time Lost" />
+            <EditText
+                android:id="@+id/dateTimeInput"
+                style="@style/InputField"
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="none" />
 
-        <!-- Submit Button -->
-        <Button
-            android:id="@+id/submitButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Post Lost Item"
-            android:backgroundTint="@color/purple_500"
-            android:textColor="@android:color/white"
-            android:padding="12dp" />
-
+            <!-- Submit Button -->
+            <Button
+                android:id="@+id/submitButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Post Lost Item"
+                android:backgroundTint="@color/purple_500"
+                android:textColor="@android:color/white"
+                android:textAllCaps="false"
+                android:layout_marginTop="24dp"
+                android:padding="12dp" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

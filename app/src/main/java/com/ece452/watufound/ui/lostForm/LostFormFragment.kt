@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -63,7 +64,8 @@ class LostFormFragment : Fragment() {
             val itemTitle = binding.itemTitleInput.text.toString().trim()
             val description = binding.descriptionInput.text.toString().trim()
             val category = binding.categorySpinner.selectedItem?.toString()?.trim() ?: ""
-            val lastSeenAt = binding.lastSeenAtSpinner.selectedItem?.toString()?.trim() ?: ""
+//            val lastSeenAt = binding.lastSeenAtSpinner.selectedItem?.toString()?.trim() ?: ""
+            val lastSeenAt = binding.lastSeenAtInput.text.toString().trim()
             val dateTimeLost = binding.dateTimeInput.text.toString().trim()
 
             // Check for empty fields
@@ -112,6 +114,17 @@ class LostFormFragment : Fragment() {
             Toast.makeText(requireContext(), "Posting your lost item...", Toast.LENGTH_SHORT).show()
             clearForm()
         }
+
+        binding.lastSeenAtInput.setOnFocusChangeListener { view, hasFocus ->
+            if (hasFocus) {
+                (view as AutoCompleteTextView).showDropDown()
+            }
+        }
+
+        binding.lastSeenAtInput.setOnClickListener {
+            binding.lastSeenAtInput.showDropDown()
+        }
+
 
     }
 
@@ -170,9 +183,13 @@ class LostFormFragment : Fragment() {
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.categorySpinner.adapter = categoryAdapter
 
-        val locationAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, locations)
-        locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.lastSeenAtSpinner.adapter = locationAdapter
+
+        val locationAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, locations)
+        binding.lastSeenAtInput.setAdapter(locationAdapter)
+
+//        val locationAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, locations)
+//        locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//        binding.lastSeenAtSpinner.adapter = locationAdapter
     }
 
 
@@ -183,7 +200,9 @@ class LostFormFragment : Fragment() {
         binding.descriptionInput.text?.clear()
         binding.dateTimeInput.text?.clear()
         binding.categorySpinner.setSelection(0)
-        binding.lastSeenAtSpinner.setSelection(0)
+//        binding.lastSeenAtSpinner.setSelection(0)
+        binding.lastSeenAtInput.text?.clear()
+
     }
 
     override fun onDestroyView() {
