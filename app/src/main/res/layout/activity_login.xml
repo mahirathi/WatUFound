@@ -110,17 +110,6 @@
             android:backgroundTint="@color/purple_700"
             android:layout_marginTop="16dp" />
 
-<!--        &lt;!&ndash; Sign Up &ndash;&gt;-->
-<!--        <TextView-->
-<!--            android:id="@+id/signUpText"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="@string/signupnudge"-->
-<!--            android:textColor="@color/purple_700"-->
-<!--            android:textSize="14sp"-->
-<!--            android:layout_marginTop="16dp"-->
-<!--            android:layout_gravity="center_horizontal" />-->
-
         <!-- Sign Up Button -->
         <Button
             android:id="@+id/signUpButton"
