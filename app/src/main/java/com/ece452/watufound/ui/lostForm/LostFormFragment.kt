@@ -192,9 +192,6 @@ class LostFormFragment : Fragment() {
 //        binding.lastSeenAtSpinner.adapter = locationAdapter
     }
 
-
-
-
     private fun clearForm() {
         binding.itemTitleInput.text?.clear()
         binding.descriptionInput.text?.clear()

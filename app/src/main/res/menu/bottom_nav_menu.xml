@@ -7,7 +7,7 @@
         android:title="Feed" />
 
     <item
-        android:id="@+id/navigation_lost"
+        android:id="@+id/navigation_post"
         android:icon="@drawable/ic_add_black_24dp"
         android:title="Post" />
 

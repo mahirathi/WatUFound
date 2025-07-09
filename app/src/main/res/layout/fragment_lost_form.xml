@@ -59,17 +59,21 @@
             <TextView
                 style="@style/TextLabel"
                 android:text="Description" />
+
             <EditText
                 android:id="@+id/descriptionInput"
                 style="@style/InputField"
+                android:layout_height="52dp"
+                android:gravity="top"
                 android:inputType="textMultiLine"
-                android:minLines="3"
-                android:gravity="top" />
+                android:minLines="3" />
 
             <!-- Category -->
+
             <TextView
                 style="@style/TextLabel"
                 android:text="Category" />
+
             <Spinner
                 android:id="@+id/categorySpinner"
                 style="@style/SpinnerField" />
