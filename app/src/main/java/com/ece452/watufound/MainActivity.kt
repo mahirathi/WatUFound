@@ -52,7 +52,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        setContentView(R.layout.activity_main)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
