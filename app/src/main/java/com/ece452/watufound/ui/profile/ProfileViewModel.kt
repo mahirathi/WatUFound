@@ -1,4 +1,4 @@
-package com.ece452.watufound.ui.dashboard
+package com.ece452.watufound.ui.profile
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class DashboardViewModel : ViewModel() {
+class ProfileViewModel : ViewModel() {
 
     private val _userName = MutableLiveData<String>()
     val userName: LiveData<String> = _userName
@@ -22,19 +22,19 @@ class DashboardViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
 
     init {
-        Log.d("DashboardViewModel", "ViewModel initialized")
+        Log.d("ProfileViewModel", "ViewModel initialized")
         loadUserProfile()
     }
 
     private fun loadUserProfile() {
-        Log.d("DashboardViewModel", "loadUserProfile called")
+        Log.d("ProfileViewModel", "loadUserProfile called")
         _isLoading.value = true
         
         val currentUser = auth.currentUser
-        Log.d("DashboardViewModel", "Current user: ${currentUser?.uid}")
+        Log.d("ProfileViewModel", "Current user: ${currentUser?.uid}")
         
         if (currentUser == null) {
-            Log.d("DashboardViewModel", "No current user found")
+            Log.d("ProfileViewModel", "No current user found")
             _userName.value = "Not logged in"
             _userEmail.value = "No email available"
             _isLoading.value = false
@@ -43,27 +43,27 @@ class DashboardViewModel : ViewModel() {
 
         // Get email from Firebase Auth
         val email = currentUser.email
-        Log.d("DashboardViewModel", "Email from Auth: $email")
+        Log.d("ProfileViewModel", "Email from Auth: $email")
         _userEmail.value = email ?: "No email available"
 
         // Get display name from Firebase Auth first
         val displayName = currentUser.displayName
-        Log.d("DashboardViewModel", "Display name from Auth: $displayName")
+        Log.d("ProfileViewModel", "Display name from Auth: $displayName")
         
         if (!displayName.isNullOrEmpty()) {
             _userName.value = displayName.toString()
             _isLoading.value = false
-            Log.d("DashboardViewModel", "Using display name from Auth")
+            Log.d("ProfileViewModel", "Using display name from Auth")
         } else {
-            Log.d("DashboardViewModel", "No display name in Auth, checking Firestore")
+            Log.d("ProfileViewModel", "No display name in Auth, checking Firestore")
             // If no display name in Auth, try to get from Firestore
             db.collection("users").document(currentUser.uid)
                 .get()
                 .addOnSuccessListener { document ->
-                    Log.d("DashboardViewModel", "Firestore document exists: ${document.exists()}")
+                    Log.d("ProfileViewModel", "Firestore document exists: ${document.exists()}")
                     if (document != null && document.exists()) {
                         val name = document.getString("name")
-                        Log.d("DashboardViewModel", "Name from Firestore: $name")
+                        Log.d("ProfileViewModel", "Name from Firestore: $name")
                         _userName.value = name ?: "No name available"
                     } else {
                         _userName.value = "No name available"
@@ -71,7 +71,7 @@ class DashboardViewModel : ViewModel() {
                     _isLoading.value = false
                 }
                 .addOnFailureListener { exception ->
-                    Log.e("DashboardViewModel", "Error loading from Firestore", exception)
+                    Log.e("ProfileViewModel", "Error loading from Firestore", exception)
                     _userName.value = "Error loading name"
                     _isLoading.value = false
                 }

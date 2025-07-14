@@ -26,7 +26,7 @@
 
     <fragment
         android:id="@+id/navigation_profile"
-        android:name="com.ece452.watufound.ui.dashboard.DashboardFragment"
+        android:name="com.ece452.watufound.ui.profile.ProfileFragment"
         android:label="Profile"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_profile" />
 </navigation>

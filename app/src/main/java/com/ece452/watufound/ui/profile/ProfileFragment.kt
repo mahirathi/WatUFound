@@ -1,4 +1,4 @@
-package com.ece452.watufound.ui.dashboard
+package com.ece452.watufound.ui.profile
 
 import android.os.Bundle
 import android.util.Log
@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.ece452.watufound.R
 
-class DashboardFragment : Fragment() {
+class ProfileFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -22,9 +22,9 @@ class DashboardFragment : Fragment() {
         Log.d("DashboardFragment", "onCreateView called")
         
         val dashboardViewModel =
-            ViewModelProvider(this).get(DashboardViewModel::class.java)
+            ViewModelProvider(this).get(ProfileViewModel::class.java)
 
-        val root = inflater.inflate(R.layout.fragment_dashboard, container, false)
+        val root = inflater.inflate(R.layout.fragment_profile, container, false)
         Log.d("DashboardFragment", "Layout inflated successfully")
 
         // Find views using findViewById
@@ -64,11 +64,8 @@ class DashboardFragment : Fragment() {
         return root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Log.d("DashboardFragment", "onViewCreated called")
-        
-        // Show a toast to confirm the fragment is loaded
-        Toast.makeText(requireContext(), "Profile view loaded", Toast.LENGTH_SHORT).show()
-    }
+//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+//        super.onViewCreated(view, savedInstanceState)
+//        Log.d("DashboardFragment", "onViewCreated called")
+//    }
 }
