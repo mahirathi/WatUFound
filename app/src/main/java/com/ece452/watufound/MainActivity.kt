@@ -30,7 +30,6 @@ object BottomNavManager {
                 R.id.navigation_post,
                 R.id.navigation_messages,
                 R.id.navigation_profile,
-                R.id.navigation_custom
             )
         )
 
@@ -64,26 +63,6 @@ class MainActivity : AppCompatActivity() {
         BottomNavManager.setup(this, navView, navController)
 
         navView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_custom -> {
-                    val user = hashMapOf(
-                        "first" to "Ada",
-                        "last" to "Lovelace",
-                        "born" to 1815
-                    )
-                    db.collection("users")
-                        .add(user)
-                        .addOnSuccessListener { documentReference ->
-                            Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-                        }
-                        .addOnFailureListener { e ->
-                            Log.w(TAG, "Error adding document", e)
-                        }
-                    true
-                }
-
-                // Let navigation handle other destinations
-                else -> {
                     val handled = androidx.navigation.ui.NavigationUI.onNavDestinationSelected(item, navController)
                     if (handled) {
                         navController.navigate(item.itemId)
@@ -92,6 +71,3 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
-    }
-}
