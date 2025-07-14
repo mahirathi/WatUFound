@@ -11,13 +11,11 @@
         android:label="Feed"
         tools:layout="@layout/fragment_home" />
 
-    <!-- ✅ Use PostContainerFragment for Post tab -->
     <fragment
         android:id="@+id/navigation_post"
-        android:name="com.ece452.watufound.ui.post.PostContainerFragment"
+        android:name="com.ece452.watufound.ui.customForm.CustomFormFragment"
         android:label="Post"
-        tools:layout="@layout/fragment_post_container" />
-
+        tools:layout="@layout/fragment_custom_form" />
     <fragment
         android:id="@+id/navigation_messages"
         android:name="com.ece452.watufound.ui.notifications.NotificationsFragment"
