@@ -14,6 +14,8 @@ import com.ece452.watufound.models.LostItemModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.navigation.fragment.findNavController
+import com.ece452.watufound.R
 
 
 class LostFormFragment : Fragment() {
@@ -113,6 +115,7 @@ class LostFormFragment : Fragment() {
 
             Toast.makeText(requireContext(), "Posting your lost item...", Toast.LENGTH_SHORT).show()
             clearForm()
+            findNavController().navigate(R.id.navigation_feed)
         }
 
         binding.lastSeenAtInput.setOnFocusChangeListener { view, hasFocus ->

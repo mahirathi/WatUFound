@@ -14,6 +14,8 @@ import com.ece452.watufound.models.FoundItemModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.navigation.fragment.findNavController
+import com.ece452.watufound.R
 
 class FoundFormFragment : Fragment() {
 
@@ -118,6 +120,7 @@ class FoundFormFragment : Fragment() {
 
             Toast.makeText(requireContext(), "Posting your found item...", Toast.LENGTH_SHORT).show()
             clearForm()
+            findNavController().navigate(R.id.navigation_feed)
         }
     }
 
