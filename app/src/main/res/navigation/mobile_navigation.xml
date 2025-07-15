@@ -29,4 +29,11 @@
         android:name="com.ece452.watufound.ui.profile.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/navigation_update_profile"
+        android:name="com.ece452.watufound.ui.profile.UpdateProfileFragment"
+        android:label="Update Profile"
+        tools:layout="@layout/fragment_update_profile" />
+
 </navigation>

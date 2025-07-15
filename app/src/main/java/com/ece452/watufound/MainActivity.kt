@@ -17,7 +17,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 
-
 object BottomNavManager {
     fun setup(
         context: AppCompatActivity,
@@ -69,5 +68,13 @@ class MainActivity : AppCompatActivity() {
                     }
                     handled
                 }
-            }
-        }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
+        val navController = navHostFragment.navController
+        return navController.navigateUp() || super.onSupportNavigateUp()
+    }
+
+}

@@ -60,6 +60,8 @@ class SignUpActivity : AppCompatActivity() {
                             val userProfile = hashMapOf(
                                 "name" to name,
                                 "email" to email,
+                                "postsCreated" to 0,
+                                "itemsReturned" to 0,
                                 "createdAt" to com.google.firebase.Timestamp.now()
                             )
 
