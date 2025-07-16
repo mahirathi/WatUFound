@@ -14,6 +14,8 @@ import com.ece452.watufound.models.FoundItemModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.navigation.fragment.findNavController
+import com.ece452.watufound.R
 
 class FoundFormFragment : Fragment() {
 
@@ -118,6 +120,7 @@ class FoundFormFragment : Fragment() {
 
             Toast.makeText(requireContext(), "Posting your found item...", Toast.LENGTH_SHORT).show()
             clearForm()
+            findNavController().navigate(R.id.navigation_feed)
         }
     }
 
@@ -144,11 +147,11 @@ class FoundFormFragment : Fragment() {
             "Douglas Wright Engineering Building (DWE)",
             "East Campus Hall (ECH)",
             "Earth Sciences & Chemistry (ESC)",
-            "Engineering Building 2 (E2)",
-            "Engineering Building 3 (E3)",
-            "Engineering Building 5 (E5)",
-            "Engineering Building 6 (E6)",
-            "Engineering Building 7 (E7)",
+            "Engineering 2 (E2)",
+            "Engineering 3 (E3)",
+            "Engineering 6 (E6)",
+            "Engineering 5 (E5)",
+            "Engineering 7 (E7)",
             "Energy Research Centre (ERC)",
             "Environment Building 1",
             "Environment Building 2",
