@@ -32,7 +32,6 @@ object BottomNavManager {
             )
         )
 
-        context.setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
 }

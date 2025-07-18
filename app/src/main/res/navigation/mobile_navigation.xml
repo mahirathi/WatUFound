@@ -36,4 +36,10 @@
         android:label="Update Profile"
         tools:layout="@layout/fragment_update_profile" />
 
+    <fragment
+        android:id="@+id/navigation_post_details"
+        android:name="com.ece452.watufound.ui.post.PostDetailsFragment"
+        android:label="Post Details"
+        tools:layout="@layout/fragment_post_details" />
+
 </navigation>

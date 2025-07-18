@@ -8,4 +8,19 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="deep_purple">#673AB7</color>
+    
+    <!-- Feed background -->
+    <color name="feed_background">#f9fafb</color>
+    
+    <!-- Lost item colors -->
+    <color name="lost_text">#b91c1c</color>
+    <color name="lost_background">#fee2e2</color>
+    
+    <!-- Found item colors -->
+    <color name="found_text">#15803d</color>
+    <color name="found_background">#dcfce7</color>
+    
+    <!-- Category colors -->
+    <color name="category_text">#4b5563</color>
+    <color name="category_background">#f3f4f6</color>
 </resources>
