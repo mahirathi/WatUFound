@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/deep_purple"
+    android:background="@drawable/login_bg"
     android:padding="24dp"
     tools:context=".ui.login.SignUpActivity">
 
@@ -86,7 +86,7 @@
             android:text="Already have an account? Sign in"
             android:textColor="@color/purple_700"
             android:textSize="14sp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_gravity="center_horizontal" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="start|center_vertical">
+
+                            <TextView
+                android:id="@+id/tagStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lost"
+                android:textColor="@color/lost_text"
+                android:background="@drawable/tag_lost_bg"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tagCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Electronics"
+                android:textColor="@color/category_text"
+                android:background="@drawable/tag_category_bg"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:textSize="12sp" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/buttonArrow"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_arrow_forward"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="View details"
+                android:layout_gravity="end" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Black iPhone 14 Pro"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/textDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lost my black iPhone 14 Pro with a clear case. Has a small crack ..."
+            android:textSize="14sp"
+            android:textColor="#444444"
+            android:layout_marginTop="4dp"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/textLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MC"
+                android:textSize="12sp"
+                android:textColor="#888888"
+                android:drawableLeft="@drawable/ic_map_pin"
+                android:drawablePadding="4dp"
+                android:layout_marginEnd="16dp" />
+
+            <TextView
+                android:id="@+id/textTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2 hours ago"
+                android:textSize="12sp"
+                android:textColor="#888888" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView> 

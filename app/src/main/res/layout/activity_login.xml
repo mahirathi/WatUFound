@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/deep_purple"
+    android:background="@drawable/login_bg"
     android:padding="24dp">
 
     <!-- White Centered Card -->
@@ -30,7 +30,8 @@
             android:textSize="28sp"
             android:textColor="@android:color/white"
             android:textStyle="bold"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone" />
 
         <!-- Welcome Text -->
         <TextView
@@ -110,17 +111,17 @@
             android:backgroundTint="@color/purple_700"
             android:layout_marginTop="16dp" />
 
-        <!-- Sign Up Button -->
+        <!-- Register Button -->
         <Button
             android:id="@+id/signUpButton"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/signupnudge"
+            android:text="REGISTER"
             android:textSize="14sp"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@android:color/white"
             android:textColor="@color/purple_700"
             android:elevation="0dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="4dp"
             android:layout_gravity="center_horizontal"
             android:padding="0dp" />
 
@@ -136,14 +137,7 @@
             android:layout_gravity="center_horizontal" />
 
         <!-- Terms of Service -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/termsservices"
-            android:textColor="@android:color/black"
-            android:textSize="12sp"
-            android:layout_marginTop="16dp"
-            android:layout_gravity="center_horizontal" />
+        <!-- Removed as per user request -->
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
