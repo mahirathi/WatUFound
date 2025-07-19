@@ -1,5 +1,7 @@
 package com.ece452.watufound.ui.foundForm
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,18 +11,21 @@ import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.ece452.watufound.databinding.FragmentFoundFormBinding
-import com.ece452.watufound.models.FoundItemModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import androidx.navigation.fragment.findNavController
 import com.ece452.watufound.R
+import com.ece452.watufound.databinding.FragmentFoundFormBinding
+import com.ece452.watufound.models.FoundItem
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class FoundFormFragment : Fragment() {
 
     private var _binding: FragmentFoundFormBinding? = null
     private val binding get() = _binding!!
+    val sdf = SimpleDateFormat("yyyy-MM-dd, HH:mm", Locale.getDefault())
+
     private val viewModel: FoundFormViewModel by viewModels()
 
     override fun onCreateView(
@@ -37,12 +42,12 @@ class FoundFormFragment : Fragment() {
         // Date & Time Picker
         binding.dateTimeInput.setOnClickListener {
             val context = requireContext()
-            val calendar = java.util.Calendar.getInstance()
+            val calendar = Calendar.getInstance()
 
-            val datePicker = android.app.DatePickerDialog(
+            val datePicker = DatePickerDialog(
                 context,
                 { _, year, month, dayOfMonth ->
-                    val timePicker = android.app.TimePickerDialog(
+                    val timePicker = TimePickerDialog(
                         context,
                         { _, hourOfDay, minute ->
                             val formattedDate = String.format(
@@ -51,15 +56,15 @@ class FoundFormFragment : Fragment() {
                             )
                             binding.dateTimeInput.setText(formattedDate)
                         },
-                        calendar.get(java.util.Calendar.HOUR_OF_DAY),
-                        calendar.get(java.util.Calendar.MINUTE),
+                        calendar.get(Calendar.HOUR_OF_DAY),
+                        calendar.get(Calendar.MINUTE),
                         true
                     )
                     timePicker.show()
                 },
-                calendar.get(java.util.Calendar.YEAR),
-                calendar.get(java.util.Calendar.MONTH),
-                calendar.get(java.util.Calendar.DAY_OF_MONTH)
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
             )
             datePicker.show()
         }
@@ -94,7 +99,6 @@ class FoundFormFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            val sdf = SimpleDateFormat("yyyy-MM-dd, HH:mm", Locale.getDefault())
             try {
                 val enteredDate: Date = sdf.parse(dateTimeFound) ?: throw IllegalArgumentException("Invalid date")
                 val currentDate = Date()
@@ -109,12 +113,13 @@ class FoundFormFragment : Fragment() {
             }
 
             viewModel.submitFoundItem(
-                FoundItemModel(
+                FoundItem(
                     itemTitle = itemTitle,
                     description = description,
                     category = category,
                     foundAt = foundAt,
-                    dateTimeFound = dateTimeFound
+                    dateTimeFound = dateTimeFound,
+                    dateCreated = sdf.format(Date())
                 )
             )
 

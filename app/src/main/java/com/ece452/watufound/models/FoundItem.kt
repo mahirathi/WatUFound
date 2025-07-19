@@ -1,9 +1,10 @@
 package com.ece452.watufound.models
 
-data class LostItemModel(
+data class FoundItem(
     val itemTitle: String = "",
     val description: String = "",
     val category: String = "",
-    val lastSeenAt: String = "",
-    val dateTimeLost: String = ""
+    val foundAt: String = "",
+    val dateTimeFound: String = "",
+    val dateCreated: String = ""
 )

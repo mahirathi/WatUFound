@@ -1,5 +1,7 @@
 package com.ece452.watufound.ui.lostForm
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,12 +12,13 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.ece452.watufound.databinding.FragmentLostFormBinding
-import com.ece452.watufound.models.LostItemModel
+import com.ece452.watufound.models.LostItem
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.navigation.fragment.findNavController
 import com.ece452.watufound.R
+import java.util.Calendar
 
 
 class LostFormFragment : Fragment() {
@@ -23,6 +26,7 @@ class LostFormFragment : Fragment() {
     private var _binding: FragmentLostFormBinding? = null
     private val binding get() = _binding!!
     private val viewModel: LostFormViewModel by viewModels()
+    val sdf = SimpleDateFormat("yyyy-MM-dd, HH:mm", Locale.getDefault())
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,26 +42,33 @@ class LostFormFragment : Fragment() {
         // Date & Time Picker implementation
         binding.dateTimeInput.setOnClickListener {
             val context = requireContext()
-            val calendar = java.util.Calendar.getInstance()
+            val calendar = Calendar.getInstance()
 
-            val datePicker = android.app.DatePickerDialog(
+            val datePicker = DatePickerDialog(
                 context,
                 { _, year, month, dayOfMonth ->
-                    val timePicker = android.app.TimePickerDialog(
+                    val timePicker = TimePickerDialog(
                         context,
                         { _, hourOfDay, minute ->
-                            val formattedDate = String.format("%04d-%02d-%02d, %02d:%02d", year, month + 1, dayOfMonth, hourOfDay, minute)
+                            val formattedDate = String.format(
+                                "%04d-%02d-%02d, %02d:%02d",
+                                year,
+                                month + 1,
+                                dayOfMonth,
+                                hourOfDay,
+                                minute
+                            )
                             binding.dateTimeInput.setText(formattedDate)
                         },
-                        calendar.get(java.util.Calendar.HOUR_OF_DAY),
-                        calendar.get(java.util.Calendar.MINUTE),
+                        calendar.get(Calendar.HOUR_OF_DAY),
+                        calendar.get(Calendar.MINUTE),
                         true
                     )
                     timePicker.show()
                 },
-                calendar.get(java.util.Calendar.YEAR),
-                calendar.get(java.util.Calendar.MONTH),
-                calendar.get(java.util.Calendar.DAY_OF_MONTH)
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
             )
             datePicker.show()
         }
@@ -66,7 +77,6 @@ class LostFormFragment : Fragment() {
             val itemTitle = binding.itemTitleInput.text.toString().trim()
             val description = binding.descriptionInput.text.toString().trim()
             val category = binding.categorySpinner.selectedItem?.toString()?.trim() ?: ""
-//            val lastSeenAt = binding.lastSeenAtSpinner.selectedItem?.toString()?.trim() ?: ""
             val lastSeenAt = binding.lastSeenAtInput.text.toString().trim()
             val dateTimeLost = binding.dateTimeInput.text.toString().trim()
 
@@ -88,7 +98,6 @@ class LostFormFragment : Fragment() {
             }
 
             // Validate that the date is not in the future
-            val sdf = SimpleDateFormat("yyyy-MM-dd, HH:mm", Locale.getDefault())
             try {
                 val enteredDate: Date = sdf.parse(dateTimeLost) ?: throw IllegalArgumentException("Invalid date")
                 val currentDate = Date()
@@ -104,12 +113,13 @@ class LostFormFragment : Fragment() {
 
             // If all checks pass, proceed to submit
             viewModel.submitLostItem(
-                LostItemModel(
+                LostItem(
                     itemTitle = itemTitle,
                     description = description,
                     category = category,
                     lastSeenAt = lastSeenAt,
-                    dateTimeLost = dateTimeLost
+                    dateTimeLost = dateTimeLost,
+                    dateCreated = sdf.format(Date())
                 )
             )
 
@@ -189,10 +199,6 @@ class LostFormFragment : Fragment() {
 
         val locationAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, locations)
         binding.lastSeenAtInput.setAdapter(locationAdapter)
-
-//        val locationAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, locations)
-//        locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-//        binding.lastSeenAtSpinner.adapter = locationAdapter
     }
 
     private fun clearForm() {
@@ -200,7 +206,6 @@ class LostFormFragment : Fragment() {
         binding.descriptionInput.text?.clear()
         binding.dateTimeInput.text?.clear()
         binding.categorySpinner.setSelection(0)
-//        binding.lastSeenAtSpinner.setSelection(0)
         binding.lastSeenAtInput.text?.clear()
 
     }

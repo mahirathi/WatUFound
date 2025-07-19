@@ -7,12 +7,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.ece452.watufound.databinding.FragmentHomeBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ece452.watufound.R
-import com.ece452.watufound.ui.home.PostAdapter
-import com.ece452.watufound.ui.home.FeedItem
-import com.ece452.watufound.ui.home.HomeViewModel
+import com.ece452.watufound.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
 

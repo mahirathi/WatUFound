@@ -9,8 +9,6 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.ece452.watufound.R
-import com.ece452.watufound.models.LostItemModel
-import com.ece452.watufound.models.FoundItemModel
 import com.ece452.watufound.utils.TimeUtils
 
 class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
@@ -48,7 +46,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                     putString("description", item.item.description)
                     putString("category", item.item.category)
                     putString("location", item.item.lastSeenAt)
-                    putString("dateTime", item.item.dateTimeLost)
+                    putString("dateTime", item.item.dateCreated)
                 }
                 is FeedItem.Found -> Bundle().apply {
                     putString("postType", "found")
@@ -56,7 +54,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                     putString("description", item.item.description)
                     putString("category", item.item.category)
                     putString("location", item.item.foundAt)
-                    putString("dateTime", item.item.dateTimeFound)
+                    putString("dateTime", item.item.dateCreated)
                 }
             }
             
@@ -82,7 +80,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                     textTitle.text = item.item.itemTitle
                     textDescription.text = item.item.description
                     textLocation.text = item.item.lastSeenAt
-                    textTime.text = TimeUtils.getRelativeTimeAgo(item.item.dateTimeLost)
+                    textTime.text = TimeUtils.getRelativeTimeAgo(item.item.dateCreated)
                 }
                 is FeedItem.Found -> {
                     tagStatus.text = "Found"
@@ -94,7 +92,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                     textTitle.text = item.item.itemTitle
                     textDescription.text = item.item.description
                     textLocation.text = item.item.foundAt
-                    textTime.text = TimeUtils.getRelativeTimeAgo(item.item.dateTimeFound)
+                    textTime.text = TimeUtils.getRelativeTimeAgo(item.item.dateCreated)
                 }
             }
         }

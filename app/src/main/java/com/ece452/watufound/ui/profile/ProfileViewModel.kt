@@ -10,11 +10,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class ProfileViewModel : ViewModel() {
 
-    private val _userName = MutableLiveData<String>()
-    val userName: LiveData<String> = _userName
+    private val _userName = MutableLiveData<String?>()
+    val userName: MutableLiveData<String?> = _userName
 
-    private val _userEmail = MutableLiveData<String>()
-    val userEmail: LiveData<String> = _userEmail
+    private val _userEmail = MutableLiveData<String?>()
+    val userEmail: MutableLiveData<String?> = _userEmail
 
     private val _postsCreated = MutableLiveData<Int>()
     val postsCreated: LiveData<Int> = _postsCreated

@@ -3,15 +3,10 @@ package com.ece452.watufound.ui.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.ece452.watufound.models.LostItemModel
-import com.ece452.watufound.models.FoundItemModel
+import com.ece452.watufound.models.FoundItem
+import com.ece452.watufound.models.LostItem
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-
-sealed class FeedItem {
-    data class Lost(val item: com.ece452.watufound.models.LostItemModel) : FeedItem()
-    data class Found(val item: com.ece452.watufound.models.FoundItemModel) : FeedItem()
-}
 
 class HomeViewModel : ViewModel() {
     private val db = Firebase.firestore
@@ -48,10 +43,10 @@ class HomeViewModel : ViewModel() {
         lostTask.addOnSuccessListener { lostResult ->
             foundTask.addOnSuccessListener { foundResult ->
                 val lostList = lostResult.documents.mapNotNull { doc ->
-                    doc.toObject(com.ece452.watufound.models.LostItemModel::class.java)?.let { FeedItem.Lost(it) }
+                    doc.toObject(LostItem::class.java)?.let { FeedItem.Lost(it) }
                 }
                 val foundList = foundResult.documents.mapNotNull { doc ->
-                    doc.toObject(com.ece452.watufound.models.FoundItemModel::class.java)?.let { FeedItem.Found(it) }
+                    doc.toObject(FoundItem::class.java)?.let { FeedItem.Found(it) }
                 }
                 val combined = (lostList + foundList).sortedByDescending {
                     when (it) {
