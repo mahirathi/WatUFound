@@ -8,5 +8,6 @@ data class FoundItem(
     val dateTimeFound: String = "",
     val dateCreated: String = "",
     val userId: String = "",
-    val userName: String = ""
+    val userName: String = "",
+    val isAnonymous: Boolean = false
 )

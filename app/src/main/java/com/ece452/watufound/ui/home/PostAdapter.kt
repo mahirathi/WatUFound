@@ -38,6 +38,11 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
         private val buttonArrow: ImageButton = itemView.findViewById(R.id.buttonArrow)
 
         fun bind(item: FeedItem) {
+            val isAnon = when (item) {
+                is FeedItem.Lost -> item.item.isAnonymous
+                is FeedItem.Found -> item.item.isAnonymous
+            }
+            android.util.Log.d("PostAdapter", "Binding FeedItem: isAnonymous=$isAnon")
             // Create navigation bundle based on item type
             val bundle = when (item) {
                 is FeedItem.Lost -> Bundle().apply {
@@ -49,6 +54,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                     putString("dateTime", item.item.dateCreated)
                     putString("userId", item.item.userId)
                     putString("userName", item.item.userName)
+                    putBoolean("isAnonymous", item.item.isAnonymous)
                 }
                 is FeedItem.Found -> Bundle().apply {
                     putString("postType", "found")
@@ -59,11 +65,13 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                     putString("dateTime", item.item.dateCreated)
                     putString("userId", item.item.userId)
                     putString("userName", item.item.userName)
+                    putBoolean("isAnonymous", item.item.isAnonymous)
                 }
             }
             
             // Set up click listeners for both card and arrow
             val cardClickListener = View.OnClickListener {
+//                android.util.Log.d("PostAdapter", "Navigating with userName=${item.item.userName}, isAnonymous=${item.item.isAnonymous}")
                 itemView.findNavController().navigate(R.id.navigation_post_details, bundle)
             }
             

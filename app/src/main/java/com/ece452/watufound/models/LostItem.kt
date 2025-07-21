@@ -8,5 +8,6 @@ data class LostItem(
     val dateTimeLost: String = "",
     val dateCreated: String = "",
     val userId: String = "",
-    val userName: String = ""
+    val userName: String = "",
+    val isAnonymous: Boolean = false
 )

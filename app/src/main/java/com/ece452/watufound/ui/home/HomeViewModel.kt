@@ -43,17 +43,30 @@ class HomeViewModel : ViewModel() {
         lostTask.addOnSuccessListener { lostResult ->
             foundTask.addOnSuccessListener { foundResult ->
                 val lostList = lostResult.documents.mapNotNull { doc ->
+
+                    // Log raw Firestore data before deserialization
+                    val raw = doc.data
+                    android.util.Log.d("HomeViewModel", "RAW LOST Firestore data: $raw")
+
                     val item = doc.toObject(LostItem::class.java)
+                    val isAnonymous = raw?.get("isAnonymous") as? Boolean ?: false
                     if (item != null) {
-                        android.util.Log.d("HomeViewModel", "Lost item: ${item.itemTitle}, userId: ${item.userId}, userName: ${item.userName}")
-                        FeedItem.Lost(item)
+                        val fixedItem = item.copy(isAnonymous = isAnonymous)
+                        android.util.Log.d("HomeViewModel", " LOST Item is: $fixedItem")
+                        FeedItem.Lost(fixedItem)
                     } else null
                 }
                 val foundList = foundResult.documents.mapNotNull { doc ->
+                    val raw = doc.data
+                    android.util.Log.d("HomeViewModel", "RAW FOUND Firestore data: $raw")
+
+
                     val item = doc.toObject(FoundItem::class.java)
+                    val isAnonymous = raw?.get("isAnonymous") as? Boolean ?: false
                     if (item != null) {
-                        android.util.Log.d("HomeViewModel", "Found item: ${item.itemTitle}, userId: ${item.userId}, userName: ${item.userName}")
-                        FeedItem.Found(item)
+                        val fixedItem = item.copy(isAnonymous = isAnonymous)
+                        android.util.Log.d("HomeViewModel", "FOUND Item is: $fixedItem")
+                        FeedItem.Found(fixedItem)
                     } else null
                 }
                 val combined = (lostList + foundList).sortedByDescending {
