@@ -12,13 +12,16 @@ class LostFormViewModel : ViewModel() {
     private val db = Firebase.firestore
 
     fun submitLostItem(item: LostItem) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
         val post = hashMapOf(
             "itemTitle" to item.itemTitle,
             "description" to item.description,
             "category" to item.category,
             "lastSeenAt" to item.lastSeenAt,
             "dateTimeLost" to item.dateTimeLost,
-            "dateCreated" to item.dateCreated
+            "dateCreated" to item.dateCreated,
+            "userId" to (currentUser?.uid ?: ""),
+            "userName" to (currentUser?.displayName ?: currentUser?.email ?: "Unknown")
         )
 
         db.collection("lost_items")

@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.ece452.watufound.R
 import com.ece452.watufound.utils.TimeUtils
+import com.google.firebase.auth.FirebaseAuth
 
 class PostDetailsFragment : Fragment() {
     
@@ -47,6 +48,22 @@ class PostDetailsFragment : Fragment() {
         val category = arguments?.getString("category", "")
         val location = arguments?.getString("location", "")
         val dateTime = arguments?.getString("dateTime", "")
+        val userId = arguments?.getString("userId", "")
+        val userName = arguments?.getString("userName", "")
+        
+        // Debug logging
+        android.util.Log.d("PostDetailsFragment", "Received data - userId: '$userId', userName: '$userName'")
+        
+        // Check if this is the current user's post
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser?.uid == userId) {
+            android.util.Log.d("PostDetailsFragment", "This is the current user's post")
+            buttonContact.isEnabled = false
+            buttonContact.text = "Your Post"
+            buttonContact.setBackgroundColor(requireContext().getColor(android.R.color.darker_gray))
+        } else {
+            android.util.Log.d("PostDetailsFragment", "This is another user's post")
+        }
         
         // Populate data based on post type
         when (postType) {
@@ -75,8 +92,26 @@ class PostDetailsFragment : Fragment() {
         
         // Set up contact button
         buttonContact.setOnClickListener {
-            // TODO: Implement contact functionality
-            // This could open a chat, show contact info, etc.
+            if (!userId.isNullOrEmpty() && !userName.isNullOrEmpty()) {
+                // Check if the current user is the post owner
+                val currentUser = FirebaseAuth.getInstance().currentUser
+                if (currentUser?.uid == userId) {
+                    // This is the user's own post - disable contact
+                    buttonContact.isEnabled = false
+                    buttonContact.text = "Your Post"
+                } else {
+                    // Navigate to conversation with the post owner
+                    val bundle = Bundle().apply {
+                        putString("otherUserId", userId)
+                        putString("otherUserName", userName)
+                    }
+                    findNavController().navigate(R.id.navigation_conversation, bundle)
+                }
+            } else {
+                // Handle case where user information is not available
+                buttonContact.isEnabled = false
+                buttonContact.text = "Contact Unavailable"
+            }
         }
     }
 } 

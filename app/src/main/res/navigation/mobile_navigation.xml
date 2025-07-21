@@ -19,9 +19,22 @@
 
     <fragment
         android:id="@+id/navigation_messages"
-        android:name="com.ece452.watufound.ui.notifications.NotificationsFragment"
+        android:name="com.ece452.watufound.ui.messages.ConversationsFragment"
         android:label="Messages"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_conversations" />
+
+    <fragment
+        android:id="@+id/navigation_conversation"
+        android:name="com.ece452.watufound.ui.messages.ConversationFragment"
+        android:label="Conversation"
+        tools:layout="@layout/fragment_conversation">
+        <argument
+            android:name="otherUserId"
+            app:argType="string" />
+        <argument
+            android:name="otherUserName"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_profile"

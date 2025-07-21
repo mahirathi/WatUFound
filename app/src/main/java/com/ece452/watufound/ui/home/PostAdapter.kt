@@ -47,6 +47,8 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                     putString("category", item.item.category)
                     putString("location", item.item.lastSeenAt)
                     putString("dateTime", item.item.dateCreated)
+                    putString("userId", item.item.userId)
+                    putString("userName", item.item.userName)
                 }
                 is FeedItem.Found -> Bundle().apply {
                     putString("postType", "found")
@@ -55,6 +57,8 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                     putString("category", item.item.category)
                     putString("location", item.item.foundAt)
                     putString("dateTime", item.item.dateCreated)
+                    putString("userId", item.item.userId)
+                    putString("userName", item.item.userName)
                 }
             }
             

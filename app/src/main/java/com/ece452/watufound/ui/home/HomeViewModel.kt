@@ -43,10 +43,18 @@ class HomeViewModel : ViewModel() {
         lostTask.addOnSuccessListener { lostResult ->
             foundTask.addOnSuccessListener { foundResult ->
                 val lostList = lostResult.documents.mapNotNull { doc ->
-                    doc.toObject(LostItem::class.java)?.let { FeedItem.Lost(it) }
+                    val item = doc.toObject(LostItem::class.java)
+                    if (item != null) {
+                        android.util.Log.d("HomeViewModel", "Lost item: ${item.itemTitle}, userId: ${item.userId}, userName: ${item.userName}")
+                        FeedItem.Lost(item)
+                    } else null
                 }
                 val foundList = foundResult.documents.mapNotNull { doc ->
-                    doc.toObject(FoundItem::class.java)?.let { FeedItem.Found(it) }
+                    val item = doc.toObject(FoundItem::class.java)
+                    if (item != null) {
+                        android.util.Log.d("HomeViewModel", "Found item: ${item.itemTitle}, userId: ${item.userId}, userName: ${item.userName}")
+                        FeedItem.Found(item)
+                    } else null
                 }
                 val combined = (lostList + foundList).sortedByDescending {
                     when (it) {
