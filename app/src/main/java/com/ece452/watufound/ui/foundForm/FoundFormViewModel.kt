@@ -12,13 +12,16 @@ class FoundFormViewModel : ViewModel() {
     private val db = Firebase.firestore
 
     fun submitFoundItem(item: FoundItem) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
         val post = hashMapOf(
             "itemTitle" to item.itemTitle,
             "description" to item.description,
             "category" to item.category,
             "foundAt" to item.foundAt,
             "dateTimeFound" to item.dateTimeFound,
-            "dateCreated" to item.dateCreated
+            "dateCreated" to item.dateCreated,
+            "userId" to (currentUser?.uid ?: ""),
+            "userName" to (currentUser?.displayName ?: currentUser?.email ?: "Unknown")
         )
 
         db.collection("found_items")

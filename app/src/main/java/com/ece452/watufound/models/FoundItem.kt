@@ -6,5 +6,7 @@ data class FoundItem(
     val category: String = "",
     val foundAt: String = "",
     val dateTimeFound: String = "",
-    val dateCreated: String = ""
+    val dateCreated: String = "",
+    val userId: String = "",
+    val userName: String = ""
 )

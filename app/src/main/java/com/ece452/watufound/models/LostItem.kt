@@ -6,5 +6,7 @@ data class LostItem(
     val category: String = "",
     val lastSeenAt: String = "",
     val dateTimeLost: String = "",
-    val dateCreated: String = ""
+    val dateCreated: String = "",
+    val userId: String = "",
+    val userName: String = ""
 )

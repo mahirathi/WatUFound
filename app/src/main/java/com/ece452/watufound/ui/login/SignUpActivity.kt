@@ -9,6 +9,7 @@ import com.ece452.watufound.databinding.ActivitySignupBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.firestore
 
 class SignUpActivity : AppCompatActivity() {
@@ -16,6 +17,7 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignupBinding
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.firestore
+    private val realtimeDb = FirebaseDatabase.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +75,22 @@ class SignUpActivity : AppCompatActivity() {
                                 }
                                 .addOnFailureListener { e ->
                                     Log.e("Firestore", "Error writing user profile for UID: $uid", e)
+                                }
+
+                            // Create user profile in Realtime Database for messaging
+                            val messagingUserProfile = hashMapOf(
+                                "uid" to uid,
+                                "displayName" to name,
+                                "email" to email
+                            )
+
+                            realtimeDb.getReference("userProfiles").child(uid)
+                                .setValue(messagingUserProfile)
+                                .addOnSuccessListener {
+                                    Log.d("RealtimeDB", "User profile created for messaging: $uid")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("RealtimeDB", "Error creating user profile for messaging: $uid", e)
                                 }
                             // End of extractable
 

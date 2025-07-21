@@ -8,6 +8,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="deep_purple">#673AB7</color>
+    <color name="darker_gray">#EAA9A9A9</color>
+    <color name="blue_500">#FF2196F3</color>
+    <color name="gray_200">#FFEEEEEE</color>
     
     <!-- Feed background -->
     <color name="feed_background">#f9fafb</color>
