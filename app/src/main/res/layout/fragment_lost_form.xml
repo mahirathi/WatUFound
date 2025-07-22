@@ -129,7 +129,7 @@
                     style="@style/TextLabel"
                     android:layout_marginTop="0dp"
                     android:layout_marginBottom="0dp"
-                    android:text="Post as Anonymous" />
+                    android:text="Post anonymously" />
 
             </LinearLayout>
 
