@@ -41,6 +41,12 @@ class ConversationViewModel : ViewModel() {
         }
     }
 
+    fun initializeAnonymousConversation(conversationId: String) {
+        currentConversationId = conversationId
+        messagesRef = database.getReference("conversations").child(currentConversationId)
+        loadMessages()
+    }
+
     private fun loadMessages() {
         messagesListener = messagesRef.orderByChild("timestamp")
             .addValueEventListener(object : ValueEventListener {

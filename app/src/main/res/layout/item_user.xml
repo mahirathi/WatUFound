@@ -35,6 +35,15 @@
                 tools:text="Alice Johnson" />
 
             <TextView
+                android:id="@+id/textPostTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/darker_gray"
+                android:textSize="13sp"
+                tools:text="Lost Wallet at SLC" />
+
+            <TextView
                 android:id="@+id/textUserEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

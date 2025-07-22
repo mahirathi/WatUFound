@@ -58,28 +58,31 @@ class ConversationFragment : Fragment() {
         Log.d("ConversationFragment", "onViewCreated called")
         
         try {
-            val otherUserId = arguments?.getString(ARG_OTHER_USER_ID) ?: ""
-            val otherUserName = arguments?.getString(ARG_OTHER_USER_NAME) ?: "Unknown"
-            
-            Log.d("ConversationFragment", "Conversation with: $otherUserName ($otherUserId)")
-            
-            // Set the conversation title
-            binding.textConversationTitle.text = "Chat with $otherUserName"
-            
+            val conversationId = arguments?.getString("conversationId")
+            val otherUserName = arguments?.getString("otherUserName") ?: "Unknown"
+            val postTitle = arguments?.getString("postTitle") ?: ""
+
+            // Set the conversation title and subtitle
+            binding.textConversationTitle.text = if (otherUserName == "Anonymous") "Chat with Anonymous" else "Chat with $otherUserName"
+            // Optionally, show postTitle as a subtitle if you have a subtitle TextView
+            // binding.textConversationSubtitle.text = postTitle
+
             // Hide action bar and bottom navigation
             hideSystemUI()
-            
-            // Setup back button
             setupBackButton()
-            
-            // Show a test message in the RecyclerView
             setupRecyclerView()
             setupSendButton()
             observeMessages()
-            
+
             // Initialize the conversation
-            conversationViewModel.initializeConversation(otherUserId)
-            
+            if (conversationId != null) {
+                conversationViewModel.initializeAnonymousConversation(conversationId)
+            } else {
+                // fallback for legacy navigation
+                val otherUserId = arguments?.getString("otherUserId") ?: ""
+                conversationViewModel.initializeConversation(otherUserId)
+            }
+
             Log.d("ConversationFragment", "Setup completed successfully")
         } catch (e: Exception) {
             Log.e("ConversationFragment", "Error in onViewCreated", e)

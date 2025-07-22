@@ -8,61 +8,65 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ece452.watufound.R
-import com.ece452.watufound.models.User
+
+// New data class for conversation list items
+data class ConversationListItem(
+    val conversationId: String,
+    val posterName: String,
+    val postTitle: String
+)
 
 class ConversationsAdapter(
-    private val onUserClick: (User) -> Unit,
-    private val onDeleteClick: ((User) -> Unit)? = null,
+    private val onConversationClick: (ConversationListItem) -> Unit,
+    private val onDeleteClick: ((ConversationListItem) -> Unit)? = null,
     private val showDeleteButton: Boolean = false
-) : ListAdapter<User, ConversationsAdapter.UserViewHolder>(UserDiffCallback()) {
+) : ListAdapter<ConversationListItem, ConversationsAdapter.ConversationViewHolder>(ConversationDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConversationViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.item_user, parent, false)
-        return UserViewHolder(view, onUserClick, onDeleteClick, showDeleteButton)
+        return ConversationViewHolder(view, onConversationClick, onDeleteClick, showDeleteButton)
     }
 
-    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ConversationViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    class UserViewHolder(
+    class ConversationViewHolder(
         itemView: View,
-        private val onUserClick: (User) -> Unit,
-        private val onDeleteClick: ((User) -> Unit)?,
+        private val onConversationClick: (ConversationListItem) -> Unit,
+        private val onDeleteClick: ((ConversationListItem) -> Unit)?,
         private val showDeleteButton: Boolean
     ) : RecyclerView.ViewHolder(itemView) {
-        
         private val userName: TextView = itemView.findViewById(R.id.textUserName)
-        private val userEmail: TextView = itemView.findViewById(R.id.textUserEmail)
+        private val postTitle: TextView = itemView.findViewById(R.id.textPostTitle)
         private val buttonDelete: android.widget.ImageButton = itemView.findViewById(R.id.buttonDelete)
 
-        fun bind(user: User) {
-            userName.text = user.displayName
-            userEmail.text = user.email
-            
-            // Show/hide delete button based on adapter settings
+        fun bind(item: ConversationListItem) {
+            userName.text = item.posterName
+            postTitle.text = item.postTitle
+
             if (showDeleteButton && onDeleteClick != null) {
                 buttonDelete.visibility = android.view.View.VISIBLE
                 buttonDelete.setOnClickListener {
-                    onDeleteClick?.let { it1 -> it1(user) }
+                    onDeleteClick?.let { it1 -> it1(item) }
                 }
             } else {
                 buttonDelete.visibility = android.view.View.GONE
             }
-            
+
             itemView.setOnClickListener {
-                onUserClick(user)
+                onConversationClick(item)
             }
         }
     }
 
-    private class UserDiffCallback : DiffUtil.ItemCallback<User>() {
-        override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
-            return oldItem.uid == newItem.uid
+    private class ConversationDiffCallback : DiffUtil.ItemCallback<ConversationListItem>() {
+        override fun areItemsTheSame(oldItem: ConversationListItem, newItem: ConversationListItem): Boolean {
+            return oldItem.conversationId == newItem.conversationId
         }
 
-        override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
+        override fun areContentsTheSame(oldItem: ConversationListItem, newItem: ConversationListItem): Boolean {
             return oldItem == newItem
         }
     }
