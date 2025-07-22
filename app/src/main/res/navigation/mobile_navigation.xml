@@ -34,6 +34,12 @@
         <argument
             android:name="otherUserName"
             app:argType="string" />
+        <argument
+            android:name="conversationId"
+            app:argType="string" />
+        <argument
+            android:name="postTitle"
+            app:argType="string" />
     </fragment>
 
     <fragment

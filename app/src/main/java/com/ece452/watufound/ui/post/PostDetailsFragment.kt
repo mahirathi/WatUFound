@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import com.ece452.watufound.R
 import com.ece452.watufound.utils.TimeUtils
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 class PostDetailsFragment : Fragment() {
     
@@ -100,25 +101,68 @@ class PostDetailsFragment : Fragment() {
         
         // Set up contact button
         buttonContact.setOnClickListener {
-            if (!userId.isNullOrEmpty() && !userName.isNullOrEmpty()) {
-                // Check if the current user is the post owner
-                val currentUser = FirebaseAuth.getInstance().currentUser
-                if (currentUser?.uid == userId) {
-                    // This is the user's own post - disable contact
-                    buttonContact.isEnabled = false
-                    buttonContact.text = "Your Post"
-                } else {
-                    // Navigate to conversation with the post owner
-                    val bundle = Bundle().apply {
-                        putString("otherUserId", userId)
-                        putString("otherUserName", userName)
-                    }
-                    findNavController().navigate(R.id.navigation_conversation, bundle)
-                }
-            } else {
-                // Handle case where user information is not available
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            if (currentUser == null) {
+                android.util.Log.e("PostDetailsFragment", "Contact failed: currentUser is null")
+                return@setOnClickListener
+            }
+            if (userId.isNullOrEmpty()) {
+                android.util.Log.e("PostDetailsFragment", "Contact failed: userId is null or empty")
+                return@setOnClickListener
+            }
+            if (userName.isNullOrEmpty()) {
+                android.util.Log.e("PostDetailsFragment", "Contact failed: userName is null or empty")
+                return@setOnClickListener
+            }
+            if (itemTitle.isNullOrEmpty()) {
+                android.util.Log.e("PostDetailsFragment", "Contact failed: itemTitle is null or empty")
+                return@setOnClickListener
+            }
+            if (currentUser.uid == userId) {
                 buttonContact.isEnabled = false
-                buttonContact.text = "Contact Unavailable"
+                buttonContact.text = "Your Post"
+                return@setOnClickListener
+            }
+            val posterName = if (isAnonymous == true) "Anonymous" else userName
+            val postTitleForConv = itemTitle
+            val db = FirebaseDatabase.getInstance().reference
+            val userConversationsRef = db.child("userConversations").child(currentUser.uid)
+            userConversationsRef.get().addOnSuccessListener { snapshot ->
+                var existingConversationId: String? = null
+                for (child in snapshot.children) {
+                    val poster = child.child("posterName").getValue(String::class.java)
+                    val postTitle = child.child("postTitle").getValue(String::class.java)
+                    if (poster == posterName && postTitle == postTitleForConv) {
+                        existingConversationId = child.child("conversationId").getValue(String::class.java)
+                        break
+                    }
+                }
+                val conversationId = existingConversationId ?: if (isAnonymous == true) java.util.UUID.randomUUID().toString() else "${currentUser.uid}_${userId}_${postTitleForConv}"
+                if (existingConversationId == null) {
+                    val metaForCurrentUser = mapOf(
+                        "conversationId" to conversationId,
+                        "posterName" to posterName,
+                        "postTitle" to postTitleForConv
+                    )
+                    val senderName = currentUser.displayName ?: currentUser.email ?: "You"
+                    val metaForPoster = mapOf(
+                        "conversationId" to conversationId,
+                        "posterName" to senderName,
+                        "postTitle" to postTitleForConv
+                    )
+                    db.child("userConversations").child(currentUser.uid).child(conversationId).setValue(metaForCurrentUser)
+                    db.child("userConversations").child(userId).child(conversationId).setValue(metaForPoster)
+                }
+                val bundle = Bundle().apply {
+                    putString("otherUserId", userId)
+                    putString("otherUserName", posterName)
+                    putString("postTitle", postTitleForConv)
+                    putString("conversationId", conversationId)
+                    if (isAnonymous == true) {
+                        putString("anonConversationId", conversationId)
+                    }
+                }
+                findNavController().navigate(R.id.navigation_conversation, bundle)
             }
         }
     }

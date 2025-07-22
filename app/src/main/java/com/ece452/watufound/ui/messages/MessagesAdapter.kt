@@ -11,7 +11,8 @@ import com.ece452.watufound.R
 import com.ece452.watufound.models.Message
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class MessagesAdapter : ListAdapter<Message, MessagesAdapter.MessageViewHolder>(MessageDiffCallback()) {
 
@@ -47,7 +48,7 @@ class MessagesAdapter : ListAdapter<Message, MessagesAdapter.MessageViewHolder>(
 
         private fun formatTimestamp(timestamp: Long): String {
             val date = Date(timestamp)
-            val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
+            val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
             return formatter.format(date)
         }
     }
