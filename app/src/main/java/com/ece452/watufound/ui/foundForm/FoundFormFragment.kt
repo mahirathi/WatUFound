@@ -83,6 +83,7 @@ class FoundFormFragment : Fragment() {
             val category = binding.categorySpinner.selectedItem?.toString()?.trim() ?: ""
             val foundAt = binding.foundAtInput.text.toString().trim()
             val dateTimeFound = binding.dateTimeInput.text.toString().trim()
+            val isAnonymous = binding.switchAnonymous.isChecked
 
             if (itemTitle.isBlank() || description.isBlank() || dateTimeFound.isBlank()) {
                 Toast.makeText(requireContext(), "Please fill out all fields.", Toast.LENGTH_SHORT).show()
@@ -119,7 +120,8 @@ class FoundFormFragment : Fragment() {
                     category = category,
                     foundAt = foundAt,
                     dateTimeFound = dateTimeFound,
-                    dateCreated = sdf.format(Date())
+                    dateCreated = sdf.format(Date()),
+                    isAnonymous = isAnonymous
                 )
             )
 

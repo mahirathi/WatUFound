@@ -20,6 +20,7 @@ class LostFormViewModel : ViewModel() {
             "lastSeenAt" to item.lastSeenAt,
             "dateTimeLost" to item.dateTimeLost,
             "dateCreated" to item.dateCreated,
+            "isAnonymous" to item.isAnonymous,
             "userId" to (currentUser?.uid ?: ""),
             "userName" to (currentUser?.displayName ?: currentUser?.email ?: "Unknown")
         )

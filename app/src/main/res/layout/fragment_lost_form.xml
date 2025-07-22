@@ -109,6 +109,30 @@
                 android:clickable="true"
                 android:inputType="none" />
 
+            <!-- Post as Anonymous Switch -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp">
+                <Switch
+                    android:id="@+id/switch_anonymous"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:layout_marginEnd="12dp" />
+
+                <TextView
+                    style="@style/TextLabel"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginBottom="0dp"
+                    android:text="Post anonymously" />
+
+            </LinearLayout>
+
             <!-- Submit Button -->
             <Button
                 android:id="@+id/submitButton"

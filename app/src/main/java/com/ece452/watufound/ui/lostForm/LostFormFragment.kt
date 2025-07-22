@@ -79,6 +79,7 @@ class LostFormFragment : Fragment() {
             val category = binding.categorySpinner.selectedItem?.toString()?.trim() ?: ""
             val lastSeenAt = binding.lastSeenAtInput.text.toString().trim()
             val dateTimeLost = binding.dateTimeInput.text.toString().trim()
+            val isAnonymous = binding.switchAnonymous.isChecked
 
             // Check for empty fields
             if (itemTitle.isBlank() || description.isBlank() || dateTimeLost.isBlank()) {
@@ -119,7 +120,8 @@ class LostFormFragment : Fragment() {
                     category = category,
                     lastSeenAt = lastSeenAt,
                     dateTimeLost = dateTimeLost,
-                    dateCreated = sdf.format(Date())
+                    dateCreated = sdf.format(Date()),
+                    isAnonymous = isAnonymous
                 )
             )
 

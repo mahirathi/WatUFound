@@ -80,6 +80,24 @@
                 android:textColor="@color/black"
                 android:layout_marginBottom="16dp" />
 
+            <!-- Posted By section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Posted By"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_marginBottom="4dp" />
+            <TextView
+                android:id="@+id/textPostedBy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Author Name"
+                android:textSize="16sp"
+                android:textColor="#444444"
+                android:layout_marginBottom="16dp" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

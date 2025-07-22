@@ -33,6 +33,7 @@ class PostDetailsFragment : Fragment() {
         val textDescription: TextView = view.findViewById(R.id.textDescription)
         val textLocation: TextView = view.findViewById(R.id.textLocation)
         val textDateTime: TextView = view.findViewById(R.id.textDateTime)
+        val textPostedBy: TextView = view.findViewById(R.id.textPostedBy)
         val buttonContact: Button = view.findViewById(R.id.buttonContact)
         
         // Set up toolbar
@@ -50,9 +51,14 @@ class PostDetailsFragment : Fragment() {
         val dateTime = arguments?.getString("dateTime", "")
         val userId = arguments?.getString("userId", "")
         val userName = arguments?.getString("userName", "")
+        val isAnonymous = arguments?.getBoolean("isAnonymous")
         
         // Debug logging
         android.util.Log.d("PostDetailsFragment", "Received data - userId: '$userId', userName: '$userName'")
+        android.util.Log.d("PostDetailsFragment", "Arguments: $arguments")
+        
+        // Set Posted By
+        textPostedBy.text = if (isAnonymous == true) "Anonymous" else userName
         
         // Check if this is the current user's post
         val currentUser = FirebaseAuth.getInstance().currentUser
@@ -63,6 +69,8 @@ class PostDetailsFragment : Fragment() {
             buttonContact.setBackgroundColor(requireContext().getColor(android.R.color.darker_gray))
         } else {
             android.util.Log.d("PostDetailsFragment", "This is another user's post")
+            // Set contact button text based on anonymity
+            buttonContact.text = if (isAnonymous == true) "Contact Anonymous" else "Contact $userName"
         }
         
         // Populate data based on post type

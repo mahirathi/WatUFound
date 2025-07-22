@@ -20,6 +20,7 @@ class FoundFormViewModel : ViewModel() {
             "foundAt" to item.foundAt,
             "dateTimeFound" to item.dateTimeFound,
             "dateCreated" to item.dateCreated,
+            "isAnonymous" to item.isAnonymous,
             "userId" to (currentUser?.uid ?: ""),
             "userName" to (currentUser?.displayName ?: currentUser?.email ?: "Unknown")
         )
