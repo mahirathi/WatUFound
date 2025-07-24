@@ -20,6 +20,8 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.ece452.watufound.utils.BuildingLocationUtils
+import android.widget.ImageView
+import com.bumptech.glide.Glide
 
 class PostDetailsFragment : Fragment(), OnMapReadyCallback {
     private var mapView: MapView? = null
@@ -43,6 +45,7 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
         
         val toolbar: Toolbar = view.findViewById(R.id.toolbar)
+        val imagePost: ImageView = view.findViewById(R.id.imagePost)
         val tagStatus: TextView = view.findViewById(R.id.tagStatus)
         val tagCategory: TextView = view.findViewById(R.id.tagCategory)
         val textTitle: TextView = view.findViewById(R.id.textTitle)
@@ -68,6 +71,19 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         val userId = arguments?.getString("userId", "")
         val userName = arguments?.getString("userName", "")
         val isAnonymous = arguments?.getBoolean("isAnonymous")
+        val imageUrl = arguments?.getString("imageUrl")
+        
+        // Load image if available
+        if (!imageUrl.isNullOrBlank()) {
+            imagePost.visibility = View.VISIBLE
+            Glide.with(requireContext())
+                .load(imageUrl)
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .centerCrop()
+                .into(imagePost)
+        } else {
+            imagePost.visibility = View.GONE
+        }
         
         // Debug logging
         android.util.Log.d("PostDetailsFragment", "Received data - userId: '$userId', userName: '$userName'")

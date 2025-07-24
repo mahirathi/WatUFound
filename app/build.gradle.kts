@@ -52,11 +52,14 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.database)
+    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
     // Google Maps SDK for Android
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     // SwipeRefreshLayout for pull-to-refresh
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-
+    implementation("com.google.firebase:firebase-storage")
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

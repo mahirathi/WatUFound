@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ece452.watufound.models.FoundItem
 import com.ece452.watufound.models.LostItem
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import java.text.SimpleDateFormat
 import java.util.*
 

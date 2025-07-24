@@ -26,6 +26,9 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.ece452.watufound.utils.BuildingLocationUtils
+import android.net.Uri
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 
 class FoundFormFragment : Fragment(), OnMapReadyCallback {
 
@@ -38,6 +41,18 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
     private var mapView: MapView? = null
     private var googleMap: GoogleMap? = null
     private var lastPin: LatLng? = null
+    private var selectedImageUri: Uri? = null
+    private lateinit var imagePickerLauncher: ActivityResultLauncher<String>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            if (uri != null) {
+                selectedImageUri = uri
+                _binding?.imagePreview?.setImageURI(uri)
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -97,6 +112,10 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
             updateMapForLocation(location)
         }
 
+        binding.buttonSelectImage.setOnClickListener {
+            imagePickerLauncher.launch("image/*")
+        }
+
         binding.submitButton.setOnClickListener {
             val itemTitle = binding.itemTitleInput.text.toString().trim()
             val description = binding.descriptionInput.text.toString().trim()
@@ -142,7 +161,8 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
                     dateTimeFound = dateTimeFound,
                     dateCreated = sdf.format(Date()),
                     isAnonymous = isAnonymous
-                )
+                ),
+                selectedImageUri // Pass the image URI
             )
 
             Toast.makeText(requireContext(), "Posting your found item...", Toast.LENGTH_SHORT).show()
@@ -289,6 +309,8 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
         binding.dateTimeInput.text?.clear()
         binding.categorySpinner.setSelection(0)
         binding.foundAtInput.text?.clear()
+        selectedImageUri = null
+        binding.imagePreview.setImageResource(R.drawable.ic_launcher_foreground)
     }
 
     // MapView lifecycle

@@ -3,15 +3,18 @@ package com.ece452.watufound.ui.foundForm
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.ece452.watufound.models.FoundItem
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.firestore.firestore
+import android.net.Uri
+import com.google.firebase.storage.FirebaseStorage
 
 class FoundFormViewModel : ViewModel() {
 
     private val db = Firebase.firestore
+    private val storage = FirebaseStorage.getInstance()
 
-    fun submitFoundItem(item: FoundItem) {
+    fun submitFoundItem(item: FoundItem, imageUri: Uri? = null) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         val post = hashMapOf(
             "itemTitle" to item.itemTitle,
@@ -25,6 +28,27 @@ class FoundFormViewModel : ViewModel() {
             "userName" to (currentUser?.displayName ?: currentUser?.email ?: "Unknown")
         )
 
+        if (imageUri != null) {
+            // Upload image to Firebase Storage
+            val imageRef = storage.reference.child("gs://ece452-watufound.firebasestorage.app")
+            imageRef.putFile(imageUri)
+                .addOnSuccessListener { taskSnapshot ->
+                    imageRef.downloadUrl.addOnSuccessListener { uri ->
+                        post["imageUrl"] = uri.toString()
+                        saveFoundItem(post)
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.w("FoundFormVM", "Image upload failed", e)
+                    // Save post without image if upload fails
+                    saveFoundItem(post)
+                }
+        } else {
+            saveFoundItem(post)
+        }
+    }
+
+    private fun saveFoundItem(post: Any) {
         db.collection("found_items")
             .add(post)
             .addOnSuccessListener {

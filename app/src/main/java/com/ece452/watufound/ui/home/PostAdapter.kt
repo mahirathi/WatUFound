@@ -5,9 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.ece452.watufound.R
 import com.ece452.watufound.utils.TimeUtils
 
@@ -29,6 +31,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
     }
 
     class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val imagePost: ImageView = itemView.findViewById(R.id.imagePost)
         private val tagStatus: TextView = itemView.findViewById(R.id.tagStatus)
         private val tagCategory: TextView = itemView.findViewById(R.id.tagCategory)
         private val textTitle: TextView = itemView.findViewById(R.id.textTitle)
@@ -55,6 +58,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                     putString("userId", item.item.userId)
                     putString("userName", item.item.userName)
                     putBoolean("isAnonymous", item.item.isAnonymous)
+                    putString("imageUrl", item.item.imageUrl)
                 }
                 is FeedItem.Found -> Bundle().apply {
                     putString("postType", "found")
@@ -66,6 +70,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                     putString("userId", item.item.userId)
                     putString("userName", item.item.userName)
                     putBoolean("isAnonymous", item.item.isAnonymous)
+                    putString("imageUrl", item.item.imageUrl)
                 }
             }
             
@@ -81,6 +86,22 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
             // Arrow button also navigates
             buttonArrow.setOnClickListener(cardClickListener)
             
+            // Load image if available
+            val imageUrl = when (item) {
+                is FeedItem.Lost -> item.item.imageUrl
+                is FeedItem.Found -> item.item.imageUrl
+            }
+            if (!imageUrl.isNullOrBlank()) {
+                imagePost.visibility = View.VISIBLE
+                Glide.with(itemView.context)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.ic_launcher_foreground)
+                    .centerCrop()
+                    .into(imagePost)
+            } else {
+                imagePost.visibility = View.GONE
+            }
+
             when (item) {
                 is FeedItem.Lost -> {
                     tagStatus.text = "Lost"

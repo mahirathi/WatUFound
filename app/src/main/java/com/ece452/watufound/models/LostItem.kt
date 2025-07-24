@@ -9,5 +9,6 @@ data class LostItem(
     val dateCreated: String = "",
     val userId: String = "",
     val userName: String = "",
-    val isAnonymous: Boolean = false
+    val isAnonymous: Boolean = false,
+    val imageUrl: String? = null
 )

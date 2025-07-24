@@ -26,6 +26,9 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.ece452.watufound.utils.BuildingLocationUtils
+import android.net.Uri
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 
 
 class LostFormFragment : Fragment(), OnMapReadyCallback {
@@ -37,6 +40,18 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
     private var mapView: MapView? = null
     private var googleMap: GoogleMap? = null
     private var lastPin: LatLng? = null
+    private var selectedImageUri: Uri? = null
+    private lateinit var imagePickerLauncher: ActivityResultLauncher<String>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            if (uri != null) {
+                selectedImageUri = uri
+                _binding?.imagePreview?.setImageURI(uri)
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,6 +99,10 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
                 calendar.get(Calendar.DAY_OF_MONTH)
             )
             datePicker.show()
+        }
+
+        binding.buttonSelectImage.setOnClickListener {
+            imagePickerLauncher.launch("image/*")
         }
 
         binding.submitButton.setOnClickListener {
@@ -135,7 +154,8 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
                     dateTimeLost = dateTimeLost,
                     dateCreated = sdf.format(Date()),
                     isAnonymous = isAnonymous
-                )
+                ),
+                selectedImageUri // Pass the image URI
             )
 
             Toast.makeText(requireContext(), "Posting your lost item...", Toast.LENGTH_SHORT).show()
@@ -306,6 +326,7 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
         binding.dateTimeInput.text?.clear()
         binding.categorySpinner.setSelection(0)
         binding.lastSeenAtInput.text?.clear()
-
+        selectedImageUri = null
+        binding.imagePreview.setImageResource(R.drawable.ic_launcher_foreground)
     }
 }
