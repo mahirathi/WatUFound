@@ -19,8 +19,15 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.ece452.watufound.utils.BuildingLocationUtils
 
-class FoundFormFragment : Fragment() {
+class FoundFormFragment : Fragment(), OnMapReadyCallback {
 
     private var _binding: FragmentFoundFormBinding? = null
     private val binding get() = _binding!!
@@ -28,12 +35,20 @@ class FoundFormFragment : Fragment() {
 
     private val viewModel: FoundFormViewModel by viewModels()
 
+    private var mapView: MapView? = null
+    private var googleMap: GoogleMap? = null
+    private var lastPin: LatLng? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentFoundFormBinding.inflate(inflater, container, false)
-        return binding.root
+        val view = _binding?.root ?: FragmentFoundFormBinding.inflate(inflater, container, false).root
+        mapView = view.findViewById(R.id.mapViewPreview)
+        mapView?.onCreate(savedInstanceState)
+        mapView?.getMapAsync(this)
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -75,6 +90,11 @@ class FoundFormFragment : Fragment() {
         }
         binding.foundAtInput.setOnClickListener {
             binding.foundAtInput.showDropDown()
+        }
+
+        binding.foundAtInput.setOnItemClickListener { _, _, position, _ ->
+            val location = binding.foundAtInput.adapter.getItem(position) as? String
+            updateMapForLocation(location)
         }
 
         binding.submitButton.setOnClickListener {
@@ -190,6 +210,79 @@ class FoundFormFragment : Fragment() {
         binding.foundAtInput.setAdapter(locationAdapter)
     }
 
+    private fun updateMapForLocation(location: String?) {
+        if (location.isNullOrBlank() || location == "Select Location" || location == "Other") {
+            googleMap?.clear()
+            binding.mapViewPreview.visibility = View.GONE
+            return
+        }
+        
+        val latLng = BuildingLocationUtils.getBuildingLatLng(requireContext(), location)
+        if (latLng != null) {
+            // Show the map
+            binding.mapViewPreview.visibility = View.VISIBLE
+            
+            googleMap?.clear()
+            googleMap?.addMarker(MarkerOptions().position(latLng).title(location))
+            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+            lastPin = latLng
+        } else {
+            // Hide the map if coordinates not found
+            binding.mapViewPreview.visibility = View.GONE
+            googleMap?.clear()
+        }
+    }
+
+    override fun onMapReady(map: GoogleMap) {
+        googleMap = map
+        // Enable zoom controls
+        googleMap?.uiSettings?.isZoomControlsEnabled = true
+        
+        // Apply purple theme styling
+        val purpleStyle = """
+            [
+                {
+                    "featureType": "all",
+                    "elementType": "geometry.fill",
+                    "stylers": [
+                        {
+                            "color": "#f3e5f5"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#e1bee7"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#f8f0ff"
+                        }
+                    ]
+                }
+            ]
+        """.trimIndent()
+        
+        try {
+            val mapStyleOptions = com.google.android.gms.maps.model.MapStyleOptions(purpleStyle)
+            googleMap?.setMapStyle(mapStyleOptions)
+        } catch (e: Exception) {
+            android.util.Log.e("FoundFormFragment", "Map styling failed", e)
+        }
+        
+        // If a location was already selected, show it
+        val location = binding.foundAtInput.text.toString()
+        updateMapForLocation(location)
+    }
+
     private fun clearForm() {
         binding.itemTitleInput.text?.clear()
         binding.descriptionInput.text?.clear()
@@ -198,8 +291,9 @@ class FoundFormFragment : Fragment() {
         binding.foundAtInput.text?.clear()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    // MapView lifecycle
+    override fun onResume() { super.onResume(); mapView?.onResume() }
+    override fun onPause() { super.onPause(); mapView?.onPause() }
+    override fun onDestroyView() { super.onDestroyView(); mapView?.onDestroy(); _binding = null }
+    override fun onLowMemory() { super.onLowMemory(); mapView?.onLowMemory() }
 }

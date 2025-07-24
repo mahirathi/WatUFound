@@ -95,6 +95,14 @@
                 android:dropDownHeight="200dp"
                 android:completionThreshold="1" />
 
+            <!-- Map Preview -->
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapViewPreview"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone" />
+
             <!-- Date & Time Found -->
             <TextView
                 style="@style/TextLabel"

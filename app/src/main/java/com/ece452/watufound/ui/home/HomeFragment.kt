@@ -8,6 +8,7 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ece452.watufound.R
 import com.ece452.watufound.databinding.FragmentHomeBinding
 
@@ -35,8 +36,15 @@ class HomeFragment : Fragment() {
         binding.recyclerViewPosts.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewPosts.adapter = adapter
 
+        // Set up SwipeRefreshLayout
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            homeViewModel.refreshPosts()
+        }
+
         homeViewModel.filteredPosts.observe(viewLifecycleOwner) { posts ->
             adapter.updatePosts(posts)
+            // Stop the refresh animation when data is loaded
+            binding.swipeRefreshLayout.isRefreshing = false
         }
 
         binding.buttonAll.setOnClickListener {
@@ -51,10 +59,22 @@ class HomeFragment : Fragment() {
             homeViewModel.setFilter(HomeViewModel.Filter.FOUND)
             highlightFilterButton(binding.buttonFound)
         }
+        
+        // Refresh button
+        binding.buttonRefresh.setOnClickListener {
+            homeViewModel.refreshPosts()
+        }
+        
         // Default highlight
         highlightFilterButton(binding.buttonAll)
 
         return root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh the feed when returning to this fragment (e.g., after creating a post)
+        homeViewModel.refreshPosts()
     }
 
     private fun highlightFilterButton(selected: Button) {

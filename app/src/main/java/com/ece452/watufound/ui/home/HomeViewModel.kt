@@ -7,6 +7,8 @@ import com.ece452.watufound.models.FoundItem
 import com.ece452.watufound.models.LostItem
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.text.SimpleDateFormat
+import java.util.*
 
 class HomeViewModel : ViewModel() {
     private val db = Firebase.firestore
@@ -26,6 +28,10 @@ class HomeViewModel : ViewModel() {
     fun setFilter(filter: Filter) {
         currentFilter = filter
         filterPosts()
+    }
+
+    fun refreshPosts() {
+        fetchPosts()
     }
 
     private fun filterPosts() {
@@ -69,10 +75,42 @@ class HomeViewModel : ViewModel() {
                         FeedItem.Found(fixedItem)
                     } else null
                 }
-                val combined = (lostList + foundList).sortedByDescending {
-                    when (it) {
-                        is FeedItem.Lost -> it.item.dateTimeLost
-                        is FeedItem.Found -> it.item.dateTimeFound
+                val combined = (lostList + foundList).sortedByDescending { post ->
+                    val dateString = when (post) {
+                        is FeedItem.Lost -> post.item.dateCreated
+                        is FeedItem.Found -> post.item.dateCreated
+                    }
+                    
+                    // Parse the date string to get a proper Date object for comparison
+                    try {
+                        val timestamp = when {
+                            dateString.matches(Regex("\\d{4}-\\d{2}-\\d{2}, \\d{2}:\\d{2}")) -> {
+                                // Format: "2025-07-23, 14:30"
+                                val dateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm", Locale.getDefault())
+                                dateFormat.parse(dateString)?.time ?: 0L
+                            }
+                            dateString.matches(Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}")) -> {
+                                // Format: "2025-07-23 14:30"
+                                val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                                dateFormat.parse(dateString)?.time ?: 0L
+                            }
+                            else -> {
+                                // Try default format as fallback
+                                val dateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm", Locale.getDefault())
+                                dateFormat.parse(dateString)?.time ?: 0L
+                            }
+                        }
+                        
+                        // Debug logging
+                        android.util.Log.d("HomeViewModel", "Post: ${when (post) {
+                            is FeedItem.Lost -> post.item.itemTitle
+                            is FeedItem.Found -> post.item.itemTitle
+                        }}, Date string: $dateString, Timestamp: $timestamp")
+                        
+                        timestamp
+                    } catch (e: Exception) {
+                        android.util.Log.e("HomeViewModel", "Error parsing date: $dateString", e)
+                        0L // Use 0 for invalid dates (they'll appear at the end)
                     }
                 }
                 _allPosts.value = combined

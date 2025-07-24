@@ -136,6 +136,13 @@
                 android:drawablePadding="8dp"
                 android:layout_marginBottom="24dp" />
 
+            <!-- Map Preview -->
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/mapViewPreview"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="24dp" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

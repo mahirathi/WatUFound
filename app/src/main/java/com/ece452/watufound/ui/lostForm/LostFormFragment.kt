@@ -19,20 +19,33 @@ import java.util.Locale
 import androidx.navigation.fragment.findNavController
 import com.ece452.watufound.R
 import java.util.Calendar
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.ece452.watufound.utils.BuildingLocationUtils
 
 
-class LostFormFragment : Fragment() {
+class LostFormFragment : Fragment(), OnMapReadyCallback {
 
     private var _binding: FragmentLostFormBinding? = null
     private val binding get() = _binding!!
     private val viewModel: LostFormViewModel by viewModels()
     val sdf = SimpleDateFormat("yyyy-MM-dd, HH:mm", Locale.getDefault())
+    private var mapView: MapView? = null
+    private var googleMap: GoogleMap? = null
+    private var lastPin: LatLng? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentLostFormBinding.inflate(inflater, container, false)
+        mapView = _binding?.root?.findViewById(R.id.mapViewPreview)
+        mapView?.onCreate(savedInstanceState)
+        mapView?.getMapAsync(this)
         return binding.root
     }
 
@@ -140,6 +153,11 @@ class LostFormFragment : Fragment() {
             binding.lastSeenAtInput.showDropDown()
         }
 
+        binding.lastSeenAtInput.setOnItemClickListener { _, _, position, _ ->
+            val location = binding.lastSeenAtInput.adapter.getItem(position) as? String
+            updateMapForLocation(location)
+        }
+
 
     }
 
@@ -166,15 +184,15 @@ class LostFormFragment : Fragment() {
             "Douglas Wright Engineering Building (DWE)",
             "East Campus Hall (ECH)",
             "Earth Sciences & Chemistry (ESC)",
-            "Engineering Building 2 (E2)",
-            "Engineering Building 3 (E3)",
-            "Engineering Building 5 (E5)",
-            "Engineering Building 6 (E6)",
-            "Engineering Building 7 (E7)",
+            "Engineering 2 (E2)",
+            "Engineering 3 (E3)",
+            "Engineering 5 (E5)",
+            "Engineering 6 (E6)",
+            "Engineering 7 (E7)",
             "Energy Research Centre (ERC)",
-            "Environment Building 1",
-            "Environment Building 2",
-            "Environment Building 3",
+            "Environment 1 (EV1)",
+            "Environment 2 (EV2)",
+            "Environment 3 (EV3)",
             "Federation Hall (FED)",
             "General Services Complex (GSC)",
             "Hagey Hall (HH)",
@@ -203,6 +221,85 @@ class LostFormFragment : Fragment() {
         binding.lastSeenAtInput.setAdapter(locationAdapter)
     }
 
+    private fun updateMapForLocation(location: String?) {
+        if (location.isNullOrBlank() || location == "Select Location" || location == "Other") {
+            googleMap?.clear()
+            binding.mapViewPreview.visibility = View.GONE
+            return
+        }
+        
+        val latLng = BuildingLocationUtils.getBuildingLatLng(requireContext(), location)
+        if (latLng != null) {
+            // Show the map
+            binding.mapViewPreview.visibility = View.VISIBLE
+            
+            googleMap?.clear()
+            googleMap?.addMarker(MarkerOptions().position(latLng).title(location))
+            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+            lastPin = latLng
+        } else {
+            // Hide the map if coordinates not found
+            binding.mapViewPreview.visibility = View.GONE
+            googleMap?.clear()
+        }
+    }
+
+    override fun onMapReady(map: GoogleMap) {
+        googleMap = map
+        // Enable zoom controls
+        googleMap?.uiSettings?.isZoomControlsEnabled = true
+        
+        // Apply purple theme styling
+        val purpleStyle = """
+            [
+                {
+                    "featureType": "all",
+                    "elementType": "geometry.fill",
+                    "stylers": [
+                        {
+                            "color": "#f3e5f5"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#e1bee7"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#f8f0ff"
+                        }
+                    ]
+                }
+            ]
+        """.trimIndent()
+        
+        try {
+            val mapStyleOptions = com.google.android.gms.maps.model.MapStyleOptions(purpleStyle)
+            googleMap?.setMapStyle(mapStyleOptions)
+        } catch (e: Exception) {
+            android.util.Log.e("LostFormFragment", "Map styling failed", e)
+        }
+        
+        // If a location was already selected, show it
+        val location = binding.lastSeenAtInput.text.toString()
+        updateMapForLocation(location)
+    }
+
+    // MapView lifecycle
+    override fun onResume() { super.onResume(); mapView?.onResume() }
+    override fun onPause() { super.onPause(); mapView?.onPause() }
+    override fun onDestroyView() { super.onDestroyView(); mapView?.onDestroy(); _binding = null }
+    override fun onLowMemory() { super.onLowMemory(); mapView?.onLowMemory() }
+
     private fun clearForm() {
         binding.itemTitleInput.text?.clear()
         binding.descriptionInput.text?.clear()
@@ -210,10 +307,5 @@ class LostFormFragment : Fragment() {
         binding.categorySpinner.setSelection(0)
         binding.lastSeenAtInput.text?.clear()
 
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }

@@ -13,15 +13,30 @@ import com.ece452.watufound.R
 import com.ece452.watufound.utils.TimeUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.ece452.watufound.utils.BuildingLocationUtils
 
-class PostDetailsFragment : Fragment() {
+class PostDetailsFragment : Fragment(), OnMapReadyCallback {
+    private var mapView: MapView? = null
+    private var googleMap: GoogleMap? = null
+    private var lastPin: LatLng? = null
+    private var locationName: String? = null
     
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_post_details, container, false)
+        val view = inflater.inflate(R.layout.fragment_post_details, container, false)
+        mapView = view.findViewById(R.id.mapViewPreview)
+        mapView?.onCreate(savedInstanceState)
+        mapView?.getMapAsync(this)
+        return view
     }
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -96,6 +111,7 @@ class PostDetailsFragment : Fragment() {
         tagCategory.setTextColor(requireContext().getColor(R.color.category_text))
         textTitle.text = itemTitle
         textDescription.text = description
+        locationName = location
         textLocation.text = location
         textDateTime.text = TimeUtils.getRelativeTimeAgo(dateTime ?: "")
         
@@ -166,4 +182,71 @@ class PostDetailsFragment : Fragment() {
             }
         }
     }
+
+    private fun updateMapForLocation(location: String?) {
+        if (location.isNullOrBlank() || location == "Select Location" || location == "Other") {
+            googleMap?.clear()
+            return
+        }
+        val latLng = BuildingLocationUtils.getBuildingLatLng(requireContext(), location!!)
+        if (latLng != null) {
+            googleMap?.clear()
+            googleMap?.addMarker(MarkerOptions().position(latLng).title(location))
+            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+            lastPin = latLng
+        }
+    }
+
+    override fun onMapReady(map: GoogleMap) {
+        googleMap = map
+        // Enable zoom controls
+        googleMap?.uiSettings?.isZoomControlsEnabled = true
+        
+        // Apply purple theme styling
+        val purpleStyle = """
+            [
+                {
+                    "featureType": "all",
+                    "elementType": "geometry.fill",
+                    "stylers": [
+                        {
+                            "color": "#f3e5f5"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#e1bee7"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#f8f0ff"
+                        }
+                    ]
+                }
+            ]
+        """.trimIndent()
+        
+        try {
+            val mapStyleOptions = com.google.android.gms.maps.model.MapStyleOptions(purpleStyle)
+            googleMap?.setMapStyle(mapStyleOptions)
+        } catch (e: Exception) {
+            android.util.Log.e("PostDetailsFragment", "Map styling failed", e)
+        }
+        
+        updateMapForLocation(locationName)
+    }
+
+    override fun onResume() { super.onResume(); mapView?.onResume() }
+    override fun onPause() { super.onPause(); mapView?.onPause() }
+    override fun onDestroyView() { super.onDestroyView(); mapView?.onDestroy() }
+    override fun onLowMemory() { super.onLowMemory(); mapView?.onLowMemory() }
 } 
