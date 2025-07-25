@@ -55,6 +55,9 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         val textPostedBy: TextView = view.findViewById(R.id.textPostedBy)
         val buttonContact: Button = view.findViewById(R.id.buttonContact)
         
+                // Ensure button is visible
+        buttonContact.visibility = View.VISIBLE
+        
         // Set up toolbar
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
         toolbar.setNavigationOnClickListener {
