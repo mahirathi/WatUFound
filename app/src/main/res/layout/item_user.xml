@@ -15,12 +15,10 @@
         android:id="@+id/imagePost"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginEnd="12dp"
+        android:src="@drawable/ic_image_upload"
         android:scaleType="centerCrop"
-        android:background="@drawable/rounded_image_background"
-        android:clipToOutline="true"
-        android:contentDescription="Post image"
-        android:src="@drawable/ic_launcher_foreground" />
+        android:background="@drawable/rounded_card_background"
+        android:contentDescription="Post image" />
 
     <!-- Text content in the middle -->
     <LinearLayout

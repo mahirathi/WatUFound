@@ -142,13 +142,11 @@
                 android:id="@+id/imagePreview"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
+                android:src="@drawable/ic_image_upload"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_launcher_foreground"
                 android:background="@drawable/rounded_card_background"
-                android:contentDescription="Image preview" />
+                android:contentDescription="Image preview"
+                android:layout_gravity="center" />
 
             <!-- Image Upload Button -->
             <Button

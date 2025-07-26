@@ -113,8 +113,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                 imagePost.visibility = View.VISIBLE
                 Glide.with(itemView.context)
                     .load(imageUrl)
-                    .placeholder(R.drawable.rounded_card_background)
-                    .error(R.drawable.rounded_card_background)
+                    .placeholder(R.drawable.ic_image_placeholder)
                     .centerCrop()
                     .into(imagePost)
             } else {

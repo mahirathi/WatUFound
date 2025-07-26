@@ -121,8 +121,8 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             imagePost.visibility = View.VISIBLE
             Glide.with(requireContext())
                 .load(imageUrl)
-                .placeholder(R.drawable.rounded_card_background)
-                .error(R.drawable.rounded_card_background)
+                .placeholder(R.drawable.ic_image_placeholder)
+                .error(R.drawable.ic_image_placeholder)
                 .centerCrop()
                 .into(imagePost)
         } else {
