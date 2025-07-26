@@ -77,6 +77,12 @@
         <item name="android:buttonBarNeutralButtonStyle">@style/PurpleDialogButton</item>
     </style>
 
+    <!-- Purple Switch Theme -->
+    <style name="PurpleSwitchTheme" parent="Theme.AppCompat.Light">
+        <item name="colorAccent">@color/purple_500</item>
+        <item name="android:colorAccent">@color/purple_500</item>
+    </style>
+
     <!-- Purple Dialog Button Style -->
     <style name="PurpleDialogButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">@color/purple_500</item>
