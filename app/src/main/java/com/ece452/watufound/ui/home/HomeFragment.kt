@@ -8,7 +8,6 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ece452.watufound.R
 import com.ece452.watufound.databinding.FragmentHomeBinding
 

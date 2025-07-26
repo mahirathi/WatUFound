@@ -47,6 +47,22 @@
                 android:contentDescription="Post image preview"
                 android:visibility="gone" />
 
+            <!-- Resolved Status -->
+            <TextView
+                android:id="@+id/textResolved"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="✓ Resolved"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#4CAF50"
+                android:gravity="center"
+                android:padding="8dp"
+                android:background="@drawable/rounded_card_background"
+                android:backgroundTint="#E8F5E8"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -223,6 +239,44 @@
                 android:backgroundTint="@color/purple_700"
                 android:padding="16dp"
                 android:layout_marginTop="16dp" />
+
+            <!-- Action Buttons for Post Owner -->
+            <LinearLayout
+                android:id="@+id/layoutActionButtons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="16dp"
+                android:visibility="gone">
+
+                <Button
+                    android:id="@+id/buttonResolve"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Resolve"
+                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/rounded_card_background"
+                    android:backgroundTint="#4CAF50"
+                    android:layout_marginEnd="8dp"
+                    android:padding="12dp" />
+
+                <Button
+                    android:id="@+id/buttonDelete"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Delete"
+                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/rounded_card_background"
+                    android:backgroundTint="#F44336"
+                    android:layout_marginStart="8dp"
+                    android:padding="12dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

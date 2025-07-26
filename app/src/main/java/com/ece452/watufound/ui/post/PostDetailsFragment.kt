@@ -22,6 +22,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.ece452.watufound.utils.BuildingLocationUtils
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -60,6 +62,10 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         val buttonContact: Button = view.findViewById(R.id.buttonContact)
         val labelDateTime: TextView = view.findViewById(R.id.labelDateTime)
         val textDateTimeCreated: TextView = view.findViewById(R.id.textDateTimeCreated)
+        val layoutActionButtons: View = view.findViewById(R.id.layoutActionButtons)
+        val buttonResolve: Button = view.findViewById(R.id.buttonResolve)
+        val buttonDelete: Button = view.findViewById(R.id.buttonDelete)
+        val textResolved: TextView = view.findViewById(R.id.textResolved)
                 // Ensure button is visible
         buttonContact.visibility = View.VISIBLE
         
@@ -82,6 +88,30 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         val imageUrl = arguments?.getString("imageUrl")
         val roomNumber = arguments?.getString("roomNumber", "")
         val dateTimeCreated = arguments?.getString("dateTimeCreated", "")
+        
+        // Check if post is resolved (we'll need to check this from Firestore)
+        checkIfPostIsResolved(postType, itemTitle, userId, dateTimeCreated) { isResolved ->
+            if (isResolved) {
+                textResolved.visibility = View.VISIBLE
+                // For resolved posts, show action buttons but only enable delete
+                val currentUser = FirebaseAuth.getInstance().currentUser
+                if (currentUser?.uid == userId) {
+                    layoutActionButtons.visibility = View.VISIBLE
+                    buttonResolve.visibility = View.GONE  // Hide resolve button for resolved posts
+                    buttonDelete.visibility = View.VISIBLE  // Show delete button for resolved posts
+                }
+            } else {
+                textResolved.visibility = View.GONE
+                // Show action buttons only for post owner and unresolved posts
+                val currentUser = FirebaseAuth.getInstance().currentUser
+                if (currentUser?.uid == userId) {
+                    layoutActionButtons.visibility = View.VISIBLE
+                    buttonResolve.visibility = View.VISIBLE  // Show resolve button for unresolved posts
+                    buttonDelete.visibility = View.VISIBLE  // Show delete button for unresolved posts
+                }
+            }
+        }
+        
         // Load image if available
         if (!imageUrl.isNullOrBlank()) {
             imagePost.visibility = View.VISIBLE
@@ -117,10 +147,13 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             buttonContact.isEnabled = false
             buttonContact.text = "Your Post"
             buttonContact.setBackgroundColor(requireContext().getColor(android.R.color.darker_gray))
+            // Action buttons visibility will be handled by the resolved check
         } else {
             android.util.Log.d("PostDetailsFragment", "This is another user's post")
             // Set contact button text based on anonymity
             buttonContact.text = if (isAnonymous == true) "Contact Anonymous" else "Contact $userName"
+            // Hide action buttons for other users' posts
+            layoutActionButtons.visibility = View.GONE
         }
         
         // Populate data based on post type
@@ -220,6 +253,15 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 findNavController().navigate(R.id.navigation_conversation, bundle)
             }
         }
+        
+        // Set up resolve and delete button click listeners
+        buttonResolve.setOnClickListener {
+            handleResolvePost(postType, itemTitle, userId, dateTimeCreated)
+        }
+        
+        buttonDelete.setOnClickListener {
+            handleDeletePost(postType, itemTitle, userId, dateTimeCreated)
+        }
     }
 
     private fun formatDateTime(dateTimeString: String): String {
@@ -297,6 +339,133 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         }
         
         updateMapForLocation(locationName)
+    }
+
+    private fun checkIfPostIsResolved(postType: String?, itemTitle: String?, userId: String?, dateTimeCreated: String?, callback: (Boolean) -> Unit) {
+        val db = Firebase.firestore
+        val collectionName = when (postType) {
+            "lost" -> "lost_items"
+            "found" -> "found_items"
+            else -> {
+                callback(false)
+                return
+            }
+        }
+        
+        if (itemTitle.isNullOrEmpty() || userId.isNullOrEmpty() || dateTimeCreated.isNullOrEmpty()) {
+            callback(false)
+            return
+        }
+        
+        val query = db.collection(collectionName)
+            .whereEqualTo("itemTitle", itemTitle)
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("dateCreated", dateTimeCreated)
+        
+        query.get().addOnSuccessListener { documents ->
+            if (!documents.isEmpty) {
+                val document = documents.documents[0]
+                val isResolved = document.getBoolean("isResolved") ?: false
+                callback(isResolved)
+            } else {
+                callback(false)
+            }
+        }.addOnFailureListener {
+            callback(false)
+        }
+    }
+
+    private fun handleResolvePost(postType: String?, itemTitle: String?, userId: String?, dateTimeCreated: String?) {
+        // Show confirmation dialog
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Resolve Post")
+            .setMessage("Are you sure you want to mark this post as resolved?")
+            .setPositiveButton("Resolve") { _, _ ->
+                resolvePostInFirestore(postType, itemTitle, userId, dateTimeCreated)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun handleDeletePost(postType: String?, itemTitle: String?, userId: String?, dateTimeCreated: String?) {
+        // Show confirmation dialog
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Delete Post")
+            .setMessage("Are you sure you want to delete this post? This action cannot be undone.")
+            .setPositiveButton("Delete") { _, _ ->
+                deletePostFromFirestore(postType, itemTitle, userId, dateTimeCreated)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun resolvePostInFirestore(postType: String?, itemTitle: String?, userId: String?, dateTimeCreated: String?) {
+        val db = Firebase.firestore
+        val collectionName = when (postType) {
+            "lost" -> "lost_items"
+            "found" -> "found_items"
+            else -> return
+        }
+        
+        if (itemTitle.isNullOrEmpty() || userId.isNullOrEmpty() || dateTimeCreated.isNullOrEmpty()) {
+            android.util.Log.e("PostDetailsFragment", "Missing required data for resolve")
+            return
+        }
+        
+        val query = db.collection(collectionName)
+            .whereEqualTo("itemTitle", itemTitle)
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("dateCreated", dateTimeCreated)
+        
+        query.get().addOnSuccessListener { documents ->
+            if (!documents.isEmpty) {
+                val document = documents.documents[0]
+                document.reference.update("isResolved", true)
+                    .addOnSuccessListener {
+                        android.util.Log.d("PostDetailsFragment", "Post resolved successfully")
+                        // Navigate back to home
+                        findNavController().navigateUp()
+                    }
+                    .addOnFailureListener { e ->
+                        android.util.Log.e("PostDetailsFragment", "Error resolving post", e)
+                    }
+            }
+        }
+    }
+
+    private fun deletePostFromFirestore(postType: String?, itemTitle: String?, userId: String?, dateTimeCreated: String?) {
+        val db = com.google.firebase.Firebase.firestore
+        val collectionName = when (postType) {
+            "lost" -> "lost_items"
+            "found" -> "found_items"
+            else -> return
+        }
+        
+        if (itemTitle.isNullOrEmpty() || userId.isNullOrEmpty() || dateTimeCreated.isNullOrEmpty()) {
+            android.util.Log.e("PostDetailsFragment", "Missing required data for delete")
+            return
+        }
+        
+        val query = db.collection(collectionName)
+            .whereEqualTo("itemTitle", itemTitle)
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("dateCreated", dateTimeCreated)
+        
+        query.get().addOnSuccessListener { documents ->
+            if (!documents.isEmpty) {
+                val document = documents.documents[0]
+                // Soft delete by setting isDeleted to true
+                document.reference.update("isDeleted", true)
+                    .addOnSuccessListener {
+                        android.util.Log.d("PostDetailsFragment", "Post soft deleted successfully")
+                        // Navigate back to home
+                        findNavController().navigateUp()
+                    }
+                    .addOnFailureListener { e ->
+                        android.util.Log.e("PostDetailsFragment", "Error soft deleting post", e)
+                    }
+            }
+        }
     }
 
     override fun onResume() { super.onResume(); mapView?.onResume() }

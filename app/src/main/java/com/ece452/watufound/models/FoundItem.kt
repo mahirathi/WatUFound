@@ -11,5 +11,7 @@ data class FoundItem(
     val userId: String = "",
     val userName: String = "",
     val isAnonymous: Boolean = false,
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val isResolved: Boolean = false,
+    val isDeleted: Boolean = false
 )
