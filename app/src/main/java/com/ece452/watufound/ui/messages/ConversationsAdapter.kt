@@ -10,16 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.ece452.watufound.R
-
-// Updated data class for conversation list items
-data class ConversationListItem(
-    val conversationId: String,
-    val posterName: String,
-    val postTitle: String,
-    val postImageUrl: String? = null,
-    val timestamp: String? = null,
-    val postId: String? = null
-)
+import com.ece452.watufound.ui.messages.ConversationListItem
 
 class ConversationsAdapter(
     private val onConversationClick: (ConversationListItem) -> Unit,

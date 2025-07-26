@@ -60,15 +60,13 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         val labelRoom: TextView = view.findViewById(R.id.labelRoom)
         val textDateTime: TextView = view.findViewById(R.id.textDateTime)
         val textPostedBy: TextView = view.findViewById(R.id.textPostedBy)
-        val buttonContact: Button = view.findViewById(R.id.buttonContact)
+        val buttonContact: LinearLayout = view.findViewById(R.id.buttonContact)
         val labelDateTime: TextView = view.findViewById(R.id.labelDateTime)
         val textDateTimeCreated: TextView = view.findViewById(R.id.textDateTimeCreated)
         val layoutActionButtons: View = view.findViewById(R.id.layoutActionButtons)
         val buttonResolve: Button = view.findViewById(R.id.buttonResolve)
         val buttonDelete: Button = view.findViewById(R.id.buttonDelete)
         val textResolved: TextView = view.findViewById(R.id.textResolved)
-                // Ensure button is visible
-        val buttonContact: LinearLayout = view.findViewById(R.id.buttonContact)
         val buttonContactText: TextView = buttonContact.findViewById(R.id.buttonContactText)
 
         // Ensure button is visible
@@ -158,13 +156,9 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             // Hide the chat icon for "Your Post" button
             val chatIcon = buttonContact.findViewById<android.widget.ImageView>(R.id.chatIcon)
             chatIcon?.visibility = android.view.View.GONE
-            buttonContact.text = "Your Post"
-            buttonContact.setBackgroundColor(requireContext().getColor(android.R.color.darker_gray))
             // Action buttons visibility will be handled by the resolved check
         } else {
             android.util.Log.d("PostDetailsFragment", "This is another user's post")
-            // Set contact button text based on anonymity
-            buttonContact.text = if (isAnonymous == true) "Contact Anonymous" else "Contact $userName"
             // Hide action buttons for other users' posts
             layoutActionButtons.visibility = View.GONE
             // Set contact button text to "Start Conversation"

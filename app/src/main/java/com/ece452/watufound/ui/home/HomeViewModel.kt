@@ -65,10 +65,6 @@ class HomeViewModel : ViewModel() {
                     }
 
                     if (item != null) {
-                        val fixedItem = item.copy(
-                            documentId = doc.id,
-                            isAnonymous = isAnonymous
-                        )
                         val fixedItem = item.copy(isAnonymous = isAnonymous, isResolved = isResolved, isDeleted = isDeleted)
                         android.util.Log.d("HomeViewModel", " LOST Item is: $fixedItem")
                         FeedItem.Lost(fixedItem)
@@ -90,10 +86,6 @@ class HomeViewModel : ViewModel() {
                     }
 
                     if (item != null) {
-                        val fixedItem = item.copy(
-                            documentId = doc.id,
-                            isAnonymous = isAnonymous
-                        )
                         val fixedItem = item.copy(isAnonymous = isAnonymous, isResolved = isResolved, isDeleted = isDeleted)
                         android.util.Log.d("HomeViewModel", "FOUND Item is: $fixedItem")
                         FeedItem.Found(fixedItem)
