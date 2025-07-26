@@ -17,5 +17,10 @@
     <string name="signupnudge"> Don\'t have an account? Sign up</string>
     <string name="email_label">University Email</string>
     <string name="password_label">Password</string>
+    <string name="notice_high_value_item_deposition">Higher value items (electronics, jewelry, etc.) should be deposited at the Turnkey Desk in SLC <b>before</b> creating the post.</string>
+    <string name="building_title">Building</string>
+    <string name="building_details">Building details</string>
+    <string name="room_title">Room Number</string>
+    <string name="room_details">Room details</string>
 
 </resources>

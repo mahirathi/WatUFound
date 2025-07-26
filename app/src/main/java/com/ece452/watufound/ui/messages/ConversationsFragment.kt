@@ -108,8 +108,8 @@ class ConversationsFragment : Fragment() {
                             val index = updatedConversations.indexOfFirst { it.conversationId == conversationId }
                             if (index != -1) {
                                 updatedConversations[index] = updatedConversations[index].copy(timestamp = realTimestamp)
-                                // Sort by timestamp (most recent first)
-                                updatedConversations.sortByDescending { it.timestamp }
+                                // Sort by timestamp (most recent first), handling null values
+                                updatedConversations.sortByDescending { it.timestamp ?: "" }
                                 conversationsAdapter.submitList(updatedConversations)
                             }
                         }
@@ -132,8 +132,8 @@ class ConversationsFragment : Fragment() {
                         ))
                     }
                     
-                    // Sort conversations by timestamp (most recent first)
-                    conversations.sortByDescending { it.timestamp }
+                    // Sort conversations by timestamp (most recent first), handling null values
+                    conversations.sortByDescending { it.timestamp ?: "" }
                     conversationsAdapter.submitList(conversations)
                     binding.textNoResults.visibility = if (conversations.isEmpty()) View.VISIBLE else View.GONE
                 }

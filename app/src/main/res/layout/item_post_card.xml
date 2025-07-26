@@ -107,7 +107,7 @@
             android:layout_marginTop="8dp">
 
             <TextView
-                android:id="@+id/textLocation"
+                android:id="@+id/textBuilding"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="MC"

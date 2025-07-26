@@ -56,11 +56,16 @@ class HomeViewModel : ViewModel() {
 
                     val item = doc.toObject(LostItem::class.java)
                     val isAnonymous = raw?.get("isAnonymous") as? Boolean ?: false
+                    val isResolved = raw?.get("isResolved") as? Boolean ?: false
+                    val isDeleted = raw?.get("isDeleted") as? Boolean ?: false
+
+                    // Skip deleted posts
+                    if (isDeleted) {
+                        return@mapNotNull null
+                    }
+
                     if (item != null) {
-                        val fixedItem = item.copy(
-                            documentId = doc.id,
-                            isAnonymous = isAnonymous
-                        )
+                        val fixedItem = item.copy(isAnonymous = isAnonymous, isResolved = isResolved, isDeleted = isDeleted)
                         android.util.Log.d("HomeViewModel", " LOST Item is: $fixedItem")
                         FeedItem.Lost(fixedItem)
                     } else null
@@ -72,11 +77,16 @@ class HomeViewModel : ViewModel() {
 
                     val item = doc.toObject(FoundItem::class.java)
                     val isAnonymous = raw?.get("isAnonymous") as? Boolean ?: false
+                    val isResolved = raw?.get("isResolved") as? Boolean ?: false
+                    val isDeleted = raw?.get("isDeleted") as? Boolean ?: false
+
+                    // Skip deleted posts
+                    if (isDeleted) {
+                        return@mapNotNull null
+                    }
+
                     if (item != null) {
-                        val fixedItem = item.copy(
-                            documentId = doc.id,
-                            isAnonymous = isAnonymous
-                        )
+                        val fixedItem = item.copy(isAnonymous = isAnonymous, isResolved = isResolved, isDeleted = isDeleted)
                         android.util.Log.d("HomeViewModel", "FOUND Item is: $fixedItem")
                         FeedItem.Found(fixedItem)
                     } else null

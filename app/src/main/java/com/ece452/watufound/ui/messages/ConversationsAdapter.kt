@@ -10,16 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.ece452.watufound.R
-
-// Updated data class for conversation list items
-data class ConversationListItem(
-    val conversationId: String,
-    val posterName: String,
-    val postTitle: String,
-    val postImageUrl: String? = null,
-    val timestamp: String? = null,
-    val postId: String? = null
-)
+import com.ece452.watufound.ui.messages.ConversationListItem
 
 class ConversationsAdapter(
     private val onConversationClick: (ConversationListItem) -> Unit,
@@ -52,7 +43,7 @@ class ConversationsAdapter(
         fun bind(item: ConversationListItem) {
             userName.text = item.posterName
             postTitle.text = item.postTitle
-            
+
             // Show timestamp only if it's not empty
             if (!item.timestamp.isNullOrBlank()) {
                 timestamp.visibility = View.VISIBLE

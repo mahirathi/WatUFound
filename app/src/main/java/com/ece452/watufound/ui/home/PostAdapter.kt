@@ -30,22 +30,19 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
         notifyDataSetChanged()
     }
 
-    class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class PostViewHolder(
+        itemView: View
+    ) : RecyclerView.ViewHolder(itemView) {
         private val imagePost: ImageView = itemView.findViewById(R.id.imagePost)
         private val tagStatus: TextView = itemView.findViewById(R.id.tagStatus)
         private val tagCategory: TextView = itemView.findViewById(R.id.tagCategory)
         private val textTitle: TextView = itemView.findViewById(R.id.textTitle)
         private val textDescription: TextView = itemView.findViewById(R.id.textDescription)
-        private val textLocation: TextView = itemView.findViewById(R.id.textLocation)
+        private val textLocation: TextView = itemView.findViewById(R.id.textBuilding)
         private val textTime: TextView = itemView.findViewById(R.id.textTime)
         private val buttonArrow: ImageButton = itemView.findViewById(R.id.buttonArrow)
 
         fun bind(item: FeedItem) {
-            val isAnon = when (item) {
-                is FeedItem.Lost -> item.item.isAnonymous
-                is FeedItem.Found -> item.item.isAnonymous
-            }
-            android.util.Log.d("PostAdapter", "Binding FeedItem: isAnonymous=$isAnon")
             // Create navigation bundle based on item type
             val bundle = when (item) {
                 is FeedItem.Lost -> Bundle().apply {
@@ -55,11 +52,13 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                     putString("description", item.item.description)
                     putString("category", item.item.category)
                     putString("location", item.item.lastSeenAt)
-                    putString("dateTime", item.item.dateCreated)
+                    putString("dateTime", item.item.dateTimeLost)
+                    putString("dateTimeCreated", item.item.dateCreated)
                     putString("userId", item.item.userId)
                     putString("userName", item.item.userName)
                     putBoolean("isAnonymous", item.item.isAnonymous)
                     putString("imageUrl", item.item.imageUrl)
+                    putString("roomNumber", item.item.roomNumber)
                 }
                 is FeedItem.Found -> Bundle().apply {
                     putString("postType", "found")
@@ -68,26 +67,43 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                     putString("description", item.item.description)
                     putString("category", item.item.category)
                     putString("location", item.item.foundAt)
-                    putString("dateTime", item.item.dateCreated)
+                    putString("dateTime", item.item.dateTimeFound)
+                    putString("dateTimeCreated", item.item.dateCreated)
                     putString("userId", item.item.userId)
                     putString("userName", item.item.userName)
                     putBoolean("isAnonymous", item.item.isAnonymous)
                     putString("imageUrl", item.item.imageUrl)
+                    putString("roomNumber", item.item.roomNumber)
                 }
             }
-            
+
             // Set up click listeners for both card and arrow
             val cardClickListener = View.OnClickListener {
 //                android.util.Log.d("PostAdapter", "Navigating with userName=${item.item.userName}, isAnonymous=${item.item.isAnonymous}")
                 itemView.findNavController().navigate(R.id.navigation_post_details, bundle)
             }
-            
+
             // Make entire card clickable
             itemView.setOnClickListener(cardClickListener)
-            
+
             // Arrow button also navigates
             buttonArrow.setOnClickListener(cardClickListener)
-            
+
+            // Set up resolve and delete button click listeners
+            // These buttons are now handled in PostDetailsFragment, so no listeners are set here.
+
+            val isResolved = when (item) {
+                is FeedItem.Lost -> item.item.isResolved
+                is FeedItem.Found -> item.item.isResolved
+            }
+            if (isResolved) {
+                // buttonResolve.visibility = View.GONE
+                // buttonDelete.visibility = View.GONE
+            } else {
+                // buttonResolve.visibility = View.VISIBLE
+                // buttonDelete.visibility = View.VISIBLE
+            }
+
             // Load image if available
             val imageUrl = when (item) {
                 is FeedItem.Lost -> item.item.imageUrl
@@ -97,8 +113,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                 imagePost.visibility = View.VISIBLE
                 Glide.with(itemView.context)
                     .load(imageUrl)
-                    .placeholder(R.drawable.rounded_card_background)
-                    .error(R.drawable.rounded_card_background)
+                    .placeholder(R.drawable.ic_image_placeholder)
                     .centerCrop()
                     .into(imagePost)
             } else {
@@ -133,4 +148,4 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
             }
         }
     }
-} 
+}

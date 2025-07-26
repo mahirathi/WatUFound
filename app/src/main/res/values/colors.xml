@@ -12,7 +12,8 @@
     <color name="blue_500">#FF2196F3</color>
     <color name="gray_200">#FFEEEEEE</color>
     <color name="gray_300">#FFE0E0E0</color>
-    
+
+    <color name="blue">#1A73E8</color>
     <!-- Feed background -->
     <color name="feed_background">#f9fafb</color>
     
@@ -20,7 +21,7 @@
     <color name="tab_background">#f3f4f6</color>
     <color name="tab_text_unselected">#6b7280</color>
     <color name="tab_text_selected">#3700B3</color>
-    
+
     <!-- Lost item colors -->
     <color name="lost_text">#b91c1c</color>
     <color name="lost_background">#fee2e2</color>

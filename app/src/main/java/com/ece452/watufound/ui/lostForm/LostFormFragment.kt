@@ -238,7 +238,7 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
                 if (restrictedCategories.contains(selectedCategory)) {
                     binding.buttonSelectImage.isEnabled = false
                     selectedImageUri = null
-                    binding.imagePreview.setImageResource(R.drawable.ic_launcher_foreground)
+                    binding.imagePreview.setImageResource(R.drawable.ic_image_upload)
                     Toast.makeText(requireContext(), "Image upload disabled for $selectedCategory due to security reasons.", Toast.LENGTH_SHORT).show()
                 } else {
                     binding.buttonSelectImage.isEnabled = true
@@ -379,7 +379,7 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
         binding.lastSeenAtInput.text?.clear()
         binding.roomNumberInput.text?.clear()
         selectedImageUri = null
-        binding.imagePreview.setImageResource(R.drawable.ic_launcher_foreground)
+        binding.imagePreview.setImageResource(R.drawable.ic_image_upload)
     }
 
     private fun getMonthName(month: Int): String {
