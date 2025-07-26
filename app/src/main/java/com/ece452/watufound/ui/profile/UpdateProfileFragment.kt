@@ -32,6 +32,12 @@ class UpdateProfileFragment : Fragment() {
         val passwordEditText = root.findViewById<EditText>(R.id.passwordEditText)
         val updateProfileButton = root.findViewById<Button>(R.id.updateProfileButton)
         val loadingIndicator = root.findViewById<ProgressBar>(R.id.loadingIndicator)
+        val backButton = root.findViewById<android.widget.ImageButton>(R.id.backButton)
+
+        // Set up back button
+        backButton?.setOnClickListener {
+            findNavController().navigateUp()
+        }
 
         // Observe loading state
         profileViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->

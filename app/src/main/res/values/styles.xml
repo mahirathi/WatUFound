@@ -1,5 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Existing styles (like Theme.AppCompat.Light.NoActionBar) can stay -->
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_700</item>
+        <item name="colorAccent">@color/teal_200</item>
+    </style>
+
+    <!-- Existing styles -->
     <style name="TextLabel">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -22,5 +31,62 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginBottom">16dp</item>
+    </style>
+
+    <!-- Custom style for tab buttons to disable Material Design styling -->
+    <style name="TabButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/tab_button_background</item>
+        <item name="android:backgroundTint">@android:color/transparent</item>
+        <item name="android:textColor">@color/tab_text_unselected</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:minHeight">36dp</item>
+        <item name="android:minWidth">0dp</item>
+    </style>
+
+    <!-- Style for selected tab button -->
+    <style name="TabButtonSelectedStyle" parent="TabButtonStyle">
+        <item name="android:background">@drawable/tab_button_selected_background</item>
+        <item name="android:textColor">@color/tab_text_selected</item>
+    </style>
+
+    <!-- Purple Date Picker Dialog Theme -->
+    <style name="PurpleDatePickerDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/purple_500</item>
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_500</item>
+        <item name="android:colorAccent">@color/purple_500</item>
+        <item name="android:colorPrimary">@color/purple_500</item>
+        <item name="android:colorPrimaryDark">@color/purple_500</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/PurpleDialogButton</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/PurpleDialogButton</item>
+        <item name="android:buttonBarNeutralButtonStyle">@style/PurpleDialogButton</item>
+    </style>
+
+    <!-- Purple Time Picker Dialog Theme -->
+    <style name="PurpleTimePickerDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/purple_500</item>
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_500</item>
+        <item name="android:colorAccent">@color/purple_500</item>
+        <item name="android:colorPrimary">@color/purple_500</item>
+        <item name="android:colorPrimaryDark">@color/purple_500</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/PurpleDialogButton</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/PurpleDialogButton</item>
+        <item name="android:buttonBarNeutralButtonStyle">@style/PurpleDialogButton</item>
+    </style>
+
+    <!-- Purple Switch Theme -->
+    <style name="PurpleSwitchTheme" parent="Theme.AppCompat.Light">
+        <item name="colorAccent">@color/purple_500</item>
+        <item name="android:colorAccent">@color/purple_500</item>
+    </style>
+
+    <!-- Purple Dialog Button Style -->
+    <style name="PurpleDialogButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/purple_500</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 </resources>

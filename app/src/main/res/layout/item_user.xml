@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?android:attr/selectableItemBackground"
     android:layout_margin="8dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
@@ -13,6 +19,30 @@
         android:orientation="horizontal"
         android:padding="16dp"
         android:gravity="center_vertical">
+    <!-- Post Image on the left with proper spacing -->
+    <FrameLayout
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="16dp">
+
+        <ImageView
+            android:id="@+id/imagePost"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_image_upload"
+            android:scaleType="centerCrop"
+            android:background="@drawable/rounded_card_background"
+            android:contentDescription="Post image" />
+
+        <!-- Fallback icon for when no image is available -->
+        <ImageView
+            android:id="@+id/imageFallback"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_image_placeholder"
+            android:visibility="gone"
+            android:contentDescription="No image available" />
 
         <!-- User Avatar -->
         <ImageView
@@ -30,17 +60,37 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
+    </FrameLayout>
 
-            <TextView
-                android:id="@+id/userName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="User Name"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"
-                android:layout_marginBottom="4dp" />
+    <!-- Text content in the middle with better spacing -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical">
 
+        <TextView
+            android:id="@+id/textUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:maxLines="1"
+            android:ellipsize="end"
+            tools:text="Alice Johnson" />
+
+        <TextView
+            android:id="@+id/textPostTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/darker_gray"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            tools:text="Lost Wallet at SLC" />
             <TextView
                 android:id="@+id/userEmail"
                 android:layout_width="wrap_content"
@@ -67,6 +117,36 @@
                     android:background="@drawable/tag_category_bg"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="2dp" />
+        <!-- Status indicator for resolved/deleted posts -->
+        <TextView
+            android:id="@+id/textStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="11sp"
+            android:textStyle="italic"
+            android:visibility="gone"
+            tools:text="✓ Resolved"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+    <!-- Timestamp on the right with better alignment -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="12dp">
+
+        <TextView
+            android:id="@+id/textTimestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/darker_gray"
+            android:textSize="12sp"
+            android:gravity="end"
+            tools:text="2 hours ago" />
 
                 <TextView
                     android:id="@+id/yourProfileLabel"
@@ -80,6 +160,19 @@
                     android:paddingVertical="2dp"
                     android:layout_marginStart="8dp"
                     android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Delete button (hidden by default) -->
+    <ImageButton
+        android:id="@+id/buttonDelete"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Delete conversation"
+        android:src="@drawable/ic_delete"
+        android:visibility="gone" />
 
             </LinearLayout>
 
@@ -96,4 +189,4 @@
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView> 
+</androidx.cardview.widget.CardView>

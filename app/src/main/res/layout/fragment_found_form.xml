@@ -4,7 +4,7 @@
     android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/purple_500"
+    android:background="@color/white"
     android:padding="24dp">
 
     <LinearLayout
@@ -20,7 +20,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@android:color/white"
-            android:elevation="8dp"
             android:padding="24dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="24dp"
@@ -69,7 +68,16 @@
                 android:gravity="top"
                 android:inputType="textMultiLine"
                 android:minLines="3" />
-
+            <TextView
+                android:id="@+id/noticeMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/notice_background"
+                android:autoLink="web"
+                android:text="@string/notice_high_value_item_deposition"
+                android:textColor="@color/blue"
+                android:padding="12dp"
+                android:textSize="14sp"/>
             <!-- Category -->
             <TextView
                 style="@style/TextLabel"
@@ -135,13 +143,11 @@
                 android:id="@+id/imagePreview"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
+                android:src="@drawable/ic_image_upload"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_launcher_foreground"
                 android:background="@drawable/rounded_card_background"
-                android:contentDescription="Image preview" />
+                android:contentDescription="Image preview"
+                android:layout_gravity="center" />
 
             <!-- Image Upload Button -->
             <Button
@@ -150,14 +156,17 @@
                 android:layout_height="wrap_content"
                 android:text="Upload Image"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="@color/purple_500"
+                android:textColor="@android:color/white" />
 
             <!-- Post as Anonymous Switch -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp">
                 <Switch
@@ -165,7 +174,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:layout_marginEnd="12dp" />
+                    android:layout_marginEnd="12dp"
+                    android:theme="@style/PurpleSwitchTheme" />
                 <TextView
                     style="@style/TextLabel"
                     android:text="Post anonymously"
@@ -181,8 +191,9 @@
                 android:text="Post Found Item"
                 android:backgroundTint="@color/purple_500"
                 android:textColor="@android:color/white"
-                android:textAllCaps="false"
+                android:textAllCaps="true"
                 android:layout_marginTop="24dp"
+                android:layout_marginBottom="30dp"
                 android:padding="12dp" />
         </LinearLayout>
     </LinearLayout>

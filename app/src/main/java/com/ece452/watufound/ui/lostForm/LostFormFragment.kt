@@ -75,11 +75,33 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
 
             val datePicker = DatePickerDialog(
                 context,
+                R.style.PurpleDatePickerDialog,
                 { _, year, month, dayOfMonth ->
                     val timePicker = TimePickerDialog(
                         context,
+                        R.style.PurpleTimePickerDialog,
                         { _, hourOfDay, minute ->
-                            val formattedDate = String.format(
+                            // Convert to 12-hour format with AM/PM
+                            val amPm = if (hourOfDay < 12) "AM" else "PM"
+                            val hour12 = when (hourOfDay) {
+                                0 -> 12
+                                in 13..23 -> hourOfDay - 12
+                                else -> hourOfDay
+                            }
+                            
+                            // Format for display (readable format)
+                            val displayFormat = String.format(
+                                "%s %d, %d at %d:%02d %s",
+                                getMonthName(month + 1),
+                                dayOfMonth,
+                                year,
+                                hour12,
+                                minute,
+                                amPm
+                            )
+                            
+                            // Store in internal format for database
+                            val internalFormat = String.format(
                                 "%04d-%02d-%02d, %02d:%02d",
                                 year,
                                 month + 1,
@@ -87,11 +109,14 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
                                 hourOfDay,
                                 minute
                             )
-                            binding.dateTimeInput.setText(formattedDate)
+                            
+                            // Display readable format, store internal format in tag
+                            binding.dateTimeInput.setText(displayFormat)
+                            binding.dateTimeInput.tag = internalFormat
                         },
                         calendar.get(Calendar.HOUR_OF_DAY),
                         calendar.get(Calendar.MINUTE),
-                        true
+                        false // Use 12-hour format with AM/PM
                     )
                     timePicker.show()
                 },
@@ -139,7 +164,9 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
 
             // Validate that the date is not in the future
             try {
-                val enteredDate: Date = sdf.parse(dateTimeLost) ?: throw IllegalArgumentException("Invalid date")
+                // Use internal format stored in tag, fallback to text if tag is null
+                val dateTimeForValidation = binding.dateTimeInput.tag as? String ?: binding.dateTimeInput.text.toString()
+                val enteredDate: Date = sdf.parse(dateTimeForValidation) ?: throw IllegalArgumentException("Invalid date")
                 val currentDate = Date()
 
                 if (enteredDate.after(currentDate)) {
@@ -152,6 +179,7 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
             }
 
             // If all checks pass, proceed to submit
+            val dateTimeForSubmission = binding.dateTimeInput.tag as? String ?: binding.dateTimeInput.text.toString()
             viewModel.submitLostItem(
                 LostItem(
                     itemTitle = itemTitle,
@@ -159,7 +187,7 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
                     category = category,
                     lastSeenAt = lastSeenAt,
                     roomNumber = roomNumber,
-                    dateTimeLost = dateTimeLost,
+                    dateTimeLost = dateTimeForSubmission,
                     dateCreated = sdf.format(Date()),
                     isAnonymous = isAnonymous
                 ),
@@ -215,7 +243,7 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
                 if (restrictedCategories.contains(selectedCategory)) {
                     binding.buttonSelectImage.isEnabled = false
                     selectedImageUri = null
-                    binding.imagePreview.setImageResource(R.drawable.ic_launcher_foreground)
+                    binding.imagePreview.setImageResource(R.drawable.ic_image_upload)
                     Toast.makeText(requireContext(), "Image upload disabled for $selectedCategory due to security reasons.", Toast.LENGTH_SHORT).show()
                 } else {
                     binding.buttonSelectImage.isEnabled = true
@@ -398,6 +426,24 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
         binding.lastSeenAtInput.text?.clear()
         binding.roomNumberInput.text?.clear()
         selectedImageUri = null
-        binding.imagePreview.setImageResource(R.drawable.ic_launcher_foreground)
+        binding.imagePreview.setImageResource(R.drawable.ic_image_upload)
+    }
+
+    private fun getMonthName(month: Int): String {
+        return when (month) {
+            1 -> "January"
+            2 -> "February"
+            3 -> "March"
+            4 -> "April"
+            5 -> "May"
+            6 -> "June"
+            7 -> "July"
+            8 -> "August"
+            9 -> "September"
+            10 -> "October"
+            11 -> "November"
+            12 -> "December"
+            else -> "Invalid Month"
+        }
     }
 }

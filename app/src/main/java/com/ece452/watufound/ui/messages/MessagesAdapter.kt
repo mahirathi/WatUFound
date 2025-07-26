@@ -48,7 +48,7 @@ class MessagesAdapter : ListAdapter<Message, MessagesAdapter.MessageViewHolder>(
 
         private fun formatTimestamp(timestamp: Long): String {
             val date = Date(timestamp)
-            val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+            val formatter = SimpleDateFormat("h:mm a", Locale.getDefault())
             return formatter.format(date)
         }
     }

@@ -35,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
             val email = binding.emailEditText.text.toString().trim()
             Log.d("ForgotPassword", "Email entered: $email")
             if (email.isEmpty()) {
-                Toast.makeText(this, "Please enter your email to reset password.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please enter your email above to reset your password.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             forgotPassword(email)

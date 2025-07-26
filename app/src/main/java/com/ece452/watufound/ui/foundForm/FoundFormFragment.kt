@@ -77,19 +77,48 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
 
             val datePicker = DatePickerDialog(
                 context,
+                R.style.PurpleDatePickerDialog,
                 { _, year, month, dayOfMonth ->
                     val timePicker = TimePickerDialog(
                         context,
+                        R.style.PurpleTimePickerDialog,
                         { _, hourOfDay, minute ->
-                            val formattedDate = String.format(
-                                "%04d-%02d-%02d, %02d:%02d",
-                                year, month + 1, dayOfMonth, hourOfDay, minute
+                            // Convert to 12-hour format with AM/PM
+                            val amPm = if (hourOfDay < 12) "AM" else "PM"
+                            val hour12 = when (hourOfDay) {
+                                0 -> 12
+                                in 13..23 -> hourOfDay - 12
+                                else -> hourOfDay
+                            }
+
+                            // Format for display (readable format)
+                            val displayFormat = String.format(
+                                "%s %d, %d at %d:%02d %s",
+                                getMonthName(month + 1),
+                                dayOfMonth,
+                                year,
+                                hour12,
+                                minute,
+                                amPm
                             )
-                            binding.dateTimeInput.setText(formattedDate)
+
+                            // Store in internal format for database
+                            val internalFormat = String.format(
+                                "%04d-%02d-%02d, %02d:%02d",
+                                year,
+                                month + 1,
+                                dayOfMonth,
+                                hourOfDay,
+                                minute
+                            )
+
+                            // Display readable format, store internal format in tag
+                            binding.dateTimeInput.setText(displayFormat)
+                            binding.dateTimeInput.tag = internalFormat
                         },
                         calendar.get(Calendar.HOUR_OF_DAY),
                         calendar.get(Calendar.MINUTE),
-                        true
+                        false // Use 12-hour format with AM/PM
                     )
                     timePicker.show()
                 },
@@ -143,7 +172,9 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
             }
 
             try {
-                val enteredDate: Date = sdf.parse(dateTimeFound) ?: throw IllegalArgumentException("Invalid date")
+                // Use internal format stored in tag, fallback to text if tag is null
+                val dateTimeForValidation = binding.dateTimeInput.tag as? String ?: binding.dateTimeInput.text.toString()
+                val enteredDate: Date = sdf.parse(dateTimeForValidation) ?: throw IllegalArgumentException("Invalid date")
                 val currentDate = Date()
 
                 if (enteredDate.after(currentDate)) {
@@ -155,6 +186,7 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
                 return@setOnClickListener
             }
 
+            val dateTimeForSubmission = binding.dateTimeInput.tag as? String ?: binding.dateTimeInput.text.toString()
             // Block image upload for sensitive categories
             val restrictedCategories = listOf("WatCard")
             if (restrictedCategories.contains(category) && selectedImageUri != null) {
@@ -172,12 +204,12 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
                     description = description,
                     category = category,
                     foundAt = foundAt,
+                    dateTimeFound = dateTimeForSubmission,
                     roomNumber = roomNumber,
-                    dateTimeFound = dateTimeFound,
                     dateCreated = sdf.format(Date()),
                     isAnonymous = isAnonymous
                 ),
-                selectedImageUri, // Pass the image URI
+                selectedImageUri,
                 onBanned = {
                     // Handle banned user
                     Toast.makeText(requireContext(), "You are banned from posting. Please contact an administrator.", Toast.LENGTH_LONG).show()
@@ -214,7 +246,7 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
                 if (restrictedCategories.contains(selectedCategory)) {
                     binding.buttonSelectImage.isEnabled = false
                     selectedImageUri = null
-                    binding.imagePreview.setImageResource(R.drawable.ic_launcher_foreground)
+                    binding.imagePreview.setImageResource(R.drawable.ic_image_upload)
                     Toast.makeText(requireContext(), "Image upload disabled for $selectedCategory due to security reasons.", Toast.LENGTH_SHORT).show()
                 } else {
                     binding.buttonSelectImage.isEnabled = true
@@ -371,12 +403,12 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
         binding.dateTimeInput.isEnabled = false
         binding.buttonSelectImage.isEnabled = false
         binding.switchAnonymous.isEnabled = false
-        
+
         // Disable submit button and change its appearance
         binding.submitButton.isEnabled = false
         binding.submitButton.setBackgroundColor(requireContext().getColor(android.R.color.darker_gray))
         binding.submitButton.text = "POSTING DISABLED - PLEASEE CONTACT ADMINISTRATOR"
-        
+
         // Show ban message
         val banMessage = "You are banned from posting. Please contact an administrator for assistance."
         android.widget.Toast.makeText(requireContext(), banMessage, android.widget.Toast.LENGTH_LONG).show()
@@ -390,7 +422,26 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
         binding.foundAtInput.text?.clear()
         binding.roomNumberInput.text?.clear()
         selectedImageUri = null
-        binding.imagePreview.setImageResource(R.drawable.ic_launcher_foreground)
+        binding.imagePreview.setImageResource(R.drawable.ic_image_upload)
+    }
+
+    // Helper function to get month name
+    private fun getMonthName(month: Int): String {
+        return when (month) {
+            1 -> "January"
+            2 -> "February"
+            3 -> "March"
+            4 -> "April"
+            5 -> "May"
+            6 -> "June"
+            7 -> "July"
+            8 -> "August"
+            9 -> "September"
+            10 -> "October"
+            11 -> "November"
+            12 -> "December"
+            else -> "Unknown Month"
+        }
     }
 
     // MapView lifecycle

@@ -1,6 +1,7 @@
 package com.ece452.watufound.models
 
 data class LostItem(
+    val documentId: String = "",
     val itemTitle: String = "",
     val description: String = "",
     val category: String = "",
@@ -11,5 +12,7 @@ data class LostItem(
     val userId: String = "",
     val userName: String = "",
     val isAnonymous: Boolean = false,
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val isResolved: Boolean = false,
+    val isDeleted: Boolean = false
 )

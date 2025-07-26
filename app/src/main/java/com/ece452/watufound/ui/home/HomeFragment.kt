@@ -4,11 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ece452.watufound.R
 import com.ece452.watufound.databinding.FragmentHomeBinding
 
@@ -77,14 +76,16 @@ class HomeFragment : Fragment() {
         homeViewModel.refreshPosts()
     }
 
-    private fun highlightFilterButton(selected: Button) {
+    private fun highlightFilterButton(selected: TextView) {
         val buttons = listOf(binding.buttonAll, binding.buttonLost, binding.buttonFound)
         for (btn in buttons) {
-            btn.setBackgroundColor(resources.getColor(android.R.color.white, null))
-            btn.setTextColor(resources.getColor(R.color.purple_700, null))
+            btn.isSelected = false
+            btn.setBackgroundResource(R.drawable.tab_button_background)
+            btn.setTextColor(resources.getColor(R.color.tab_text_unselected, null))
         }
-        selected.setBackgroundColor(resources.getColor(R.color.purple_200, null))
-        selected.setTextColor(resources.getColor(R.color.purple_700, null))
+        selected.isSelected = true
+        selected.setBackgroundResource(R.drawable.tab_button_selected_background)
+        selected.setTextColor(resources.getColor(R.color.tab_text_selected, null))
     }
 
     override fun onDestroyView() {

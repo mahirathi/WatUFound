@@ -11,13 +11,12 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/purple_700"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:background="@color/white"
+        android:theme="@style/Theme.AppCompat.Light"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        app:popupTheme="@style/Theme.AppCompat.Light" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -33,7 +32,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="3dp">
 
             <!-- Post Image Preview -->
             <ImageView
@@ -44,7 +45,24 @@
                 android:adjustViewBounds="true"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/rounded_card_background"
+                android:clipToOutline="true"
                 android:contentDescription="Post image preview"
+                android:visibility="gone" />
+
+            <!-- Resolved Status -->
+            <TextView
+                android:id="@+id/textResolved"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="✓ Resolved"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#4CAF50"
+                android:gravity="center"
+                android:padding="8dp"
+                android:background="@drawable/rounded_card_background"
+                android:backgroundTint="#E8F5E8"
+                android:layout_marginBottom="16dp"
                 android:visibility="gone" />
 
             <LinearLayout
@@ -151,34 +169,63 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Location"
+                android:text="@string/building_title"
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:textColor="@color/black"
                 android:layout_marginBottom="8dp" />
 
             <TextView
-                android:id="@+id/textLocation"
+                android:id="@+id/textBuilding"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Location details"
+                android:text="@string/building_details"
                 android:textSize="16sp"
                 android:textColor="#444444"
-                android:drawableLeft="@drawable/ic_map_pin"
                 android:drawablePadding="8dp"
-                android:layout_marginBottom="24dp" />
-
-            <!-- Map Preview -->
-            <com.google.android.gms.maps.MapView
-                android:id="@+id/mapViewPreview"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginBottom="24dp" />
+                android:layout_marginBottom="24dp"
+                app:drawableLeftCompat="@drawable/ic_map_pin" />
 
             <TextView
+                android:id="@+id/labelRoom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Date &amp; Time"
+                android:text="@string/room_title"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/textRoom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/room_details"
+                android:textSize="16sp"
+                android:textColor="#444444"
+                android:drawablePadding="8dp"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Map Preview -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/rounded_card_background"
+                android:clipToOutline="true">
+
+                <com.google.android.gms.maps.MapView
+                    android:id="@+id/mapViewPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/labelDateTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Date and Time"
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:textColor="@color/black"
@@ -193,16 +240,92 @@
                 android:textColor="#444444"
                 android:layout_marginBottom="24dp" />
 
-            <Button
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Created on"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/textDateTimeCreated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Created on"
+                android:textSize="16sp"
+                android:textColor="#444444"
+                android:layout_marginBottom="24dp" />
+
+            <LinearLayout
                 android:id="@+id/buttonContact"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Contact Owner"
-                android:textSize="16sp"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/purple_700"
-                android:padding="16dp"
-                android:layout_marginTop="16dp" />
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/contact_button_background"
+                android:padding="12dp"
+                android:layout_marginTop="16dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/chatIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_message_circle"
+                    android:layout_marginEnd="14dp"
+                    android:contentDescription="Message icon" />
+
+                <TextView
+                    android:id="@+id/buttonContactText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Start Conversation"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- Action Buttons for Post Owner -->
+            <LinearLayout
+                android:id="@+id/layoutActionButtons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="16dp"
+                android:visibility="gone">
+
+                <Button
+                    android:id="@+id/buttonResolve"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Resolve"
+                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/rounded_card_background"
+                    android:backgroundTint="#4CAF50"
+                    android:layout_marginEnd="8dp"
+                    android:padding="12dp" />
+
+                <Button
+                    android:id="@+id/buttonDelete"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Delete"
+                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/rounded_card_background"
+                    android:backgroundTint="#F44336"
+                    android:layout_marginStart="8dp"
+                    android:padding="12dp" />
+
+            </LinearLayout>
 
             <Button
                 android:id="@+id/buttonDelete"

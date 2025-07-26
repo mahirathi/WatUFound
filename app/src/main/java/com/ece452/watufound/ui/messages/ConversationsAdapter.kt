@@ -3,18 +3,14 @@ package com.ece452.watufound.ui.messages
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.ece452.watufound.R
-
-// New data class for conversation list items
-data class ConversationListItem(
-    val conversationId: String,
-    val posterName: String,
-    val postTitle: String
-)
+import com.ece452.watufound.ui.messages.ConversationListItem
 
 class ConversationsAdapter(
     private val onConversationClick: (ConversationListItem) -> Unit,
@@ -40,11 +36,64 @@ class ConversationsAdapter(
     ) : RecyclerView.ViewHolder(itemView) {
         private val userName: TextView = itemView.findViewById(R.id.textUserName)
         private val postTitle: TextView = itemView.findViewById(R.id.textPostTitle)
+        private val postImage: ImageView = itemView.findViewById(R.id.imagePost)
+        private val imageFallback: ImageView = itemView.findViewById(R.id.imageFallback)
+        private val timestamp: TextView = itemView.findViewById(R.id.textTimestamp)
+        private val textStatus: TextView = itemView.findViewById(R.id.textStatus)
         private val buttonDelete: android.widget.ImageButton = itemView.findViewById(R.id.buttonDelete)
 
         fun bind(item: ConversationListItem) {
             userName.text = item.posterName
             postTitle.text = item.postTitle
+
+            // Show timestamp only if it's not empty
+            if (!item.timestamp.isNullOrBlank()) {
+                timestamp.visibility = View.VISIBLE
+                timestamp.text = item.timestamp
+            } else {
+                timestamp.visibility = View.GONE
+            }
+
+            // Show status indicator for resolved/deleted posts
+            when {
+                item.isDeleted -> {
+                    textStatus.visibility = View.VISIBLE
+                    textStatus.text = "🗑️ Deleted"
+                    textStatus.setTextColor(itemView.context.getColor(R.color.status_deleted))
+                    android.util.Log.d("ConversationsAdapter", "Showing DELETED status for post: ${item.postTitle}")
+                }
+                item.isResolved -> {
+                    textStatus.visibility = View.VISIBLE
+                    textStatus.text = "✓ Resolved"
+                    textStatus.setTextColor(itemView.context.getColor(R.color.status_resolved))
+                    android.util.Log.d("ConversationsAdapter", "Showing RESOLVED status for post: ${item.postTitle}")
+                }
+                else -> {
+                    textStatus.visibility = View.GONE
+                    android.util.Log.d("ConversationsAdapter", "No status to show for post: ${item.postTitle}")
+                }
+            }
+
+            // Debug logging for image loading
+            android.util.Log.d("ConversationsAdapter", "Loading image for post: ${item.postTitle}, URL: '${item.postImageUrl}'")
+
+            // Load post image if available
+            if (!item.postImageUrl.isNullOrBlank()) {
+                postImage.visibility = View.VISIBLE
+                imageFallback.visibility = View.GONE
+                
+                Glide.with(itemView.context)
+                    .load(item.postImageUrl)
+                    .placeholder(R.drawable.rounded_image_background)
+                    .error(R.drawable.rounded_image_background)
+                    .centerCrop()
+                    .into(postImage)
+            } else {
+                // Show fallback icon when no image is available
+                postImage.visibility = View.GONE
+                imageFallback.visibility = View.VISIBLE
+                imageFallback.setImageResource(R.drawable.ic_image_placeholder)
+            }
 
             if (showDeleteButton && onDeleteClick != null) {
                 buttonDelete.visibility = android.view.View.VISIBLE
