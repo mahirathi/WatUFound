@@ -89,13 +89,25 @@
                 android:id="@+id/lastSeenAtInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Select location"
+                android:hint="eg: Engineering 7 (E7)"
                 android:inputType="text"
                 android:background="@drawable/input_field_background"
                 android:padding="12dp"
                 android:layout_marginBottom="16dp"
                 android:dropDownHeight="200dp"
                 android:completionThreshold="1" />
+
+            <!-- Room Number -->
+            <TextView
+                style="@style/TextLabel"
+                android:text="Room Number" />
+
+            <EditText
+                android:id="@+id/roomNumberInput"
+                style="@style/InputField"
+                android:hint="e.g: E7-4452"
+                android:inputType="text"
+                android:layout_marginBottom="16dp" />
 
     <!-- Map Preview -->
     <com.google.android.gms.maps.MapView
@@ -116,6 +128,30 @@
                 android:focusable="false"
                 android:clickable="true"
                 android:inputType="none" />
+
+
+
+            <!-- Image Upload Preview -->
+            <ImageView
+                android:id="@+id/imagePreview"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_launcher_foreground"
+                android:background="@drawable/rounded_card_background"
+                android:contentDescription="Image preview" />
+
+            <!-- Image Upload Button -->
+            <Button
+                android:id="@+id/buttonSelectImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Upload Image"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp" />
 
             <!-- Post as Anonymous Switch -->
 
@@ -140,28 +176,6 @@
                     android:text="Post anonymously" />
 
             </LinearLayout>
-
-            <!-- Image Upload Preview -->
-            <ImageView
-                android:id="@+id/imagePreview"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_launcher_foreground"
-                android:background="@drawable/rounded_card_background"
-                android:contentDescription="Image preview" />
-
-            <!-- Image Upload Button -->
-            <Button
-                android:id="@+id/buttonSelectImage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Upload Image"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="16dp" />
 
             <!-- Submit Button -->
             <Button
