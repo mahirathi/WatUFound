@@ -21,6 +21,7 @@ class LostFormViewModel : ViewModel() {
             "description" to item.description,
             "category" to item.category,
             "lastSeenAt" to item.lastSeenAt,
+            "roomNumber" to item.roomNumber,
             "dateTimeLost" to item.dateTimeLost,
             "dateCreated" to item.dateCreated,
             "isAnonymous" to item.isAnonymous,

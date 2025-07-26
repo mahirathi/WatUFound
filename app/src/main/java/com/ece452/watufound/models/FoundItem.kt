@@ -5,6 +5,7 @@ data class FoundItem(
     val description: String = "",
     val category: String = "",
     val foundAt: String = "",
+    val roomNumber: String = "",
     val dateTimeFound: String = "",
     val dateCreated: String = "",
     val userId: String = "",

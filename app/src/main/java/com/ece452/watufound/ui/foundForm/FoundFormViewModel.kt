@@ -21,6 +21,7 @@ class FoundFormViewModel : ViewModel() {
             "description" to item.description,
             "category" to item.category,
             "foundAt" to item.foundAt,
+            "roomNumber" to item.roomNumber,
             "dateTimeFound" to item.dateTimeFound,
             "dateCreated" to item.dateCreated,
             "isAnonymous" to item.isAnonymous,
