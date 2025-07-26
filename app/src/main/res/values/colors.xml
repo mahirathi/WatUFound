@@ -33,4 +33,8 @@
     <!-- Category colors -->
     <color name="category_text">#4b5563</color>
     <color name="category_background">#f3f4f6</color>
+    
+    <!-- Status colors -->
+    <color name="status_resolved">#15803d</color>
+    <color name="status_deleted">#dc2626</color>
 </resources>
