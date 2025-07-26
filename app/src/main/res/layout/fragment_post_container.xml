@@ -5,14 +5,50 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- TabLayout for Lost / Found toggle -->
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
+    <!-- Custom Tab Switcher for Lost / Found toggle -->
+    <LinearLayout
+        android:id="@+id/tabSwitcher"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:tabIndicatorColor="@color/purple_500"
-        app:tabSelectedTextColor="@color/purple_500"
-        app:tabTextColor="@android:color/darker_gray" />
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/tab_container_background"
+        android:padding="4dp"
+        android:clipToOutline="true">
+
+        <TextView
+            android:id="@+id/buttonLostItem"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="2dp"
+            android:text="Lost Item"
+            android:background="@drawable/tab_button_selected_background"
+            android:textColor="@color/tab_text_selected"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true" />
+            
+        <TextView
+            android:id="@+id/buttonFoundItem"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginStart="2dp"
+            android:text="Found Item"
+            android:background="@drawable/tab_button_background"
+            android:textColor="@color/tab_text_unselected"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
 
     <!-- Container to swap LostFormFragment / FoundFormFragment -->
     <FrameLayout

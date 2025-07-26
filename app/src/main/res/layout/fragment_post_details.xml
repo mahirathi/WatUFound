@@ -11,13 +11,12 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/purple_700"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:background="@color/white"
+        android:theme="@style/Theme.AppCompat.Light"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        app:popupTheme="@style/Theme.AppCompat.Light" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -32,7 +31,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="3dp">
 
             <!-- Post Image Preview -->
             <ImageView
@@ -177,12 +178,15 @@
                 android:id="@+id/buttonContact"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Contact Owner"
-                android:textSize="16sp"
+                android:text="Start Conversation"
+                android:textSize="12sp"
                 android:textColor="@color/white"
-                android:backgroundTint="@color/purple_700"
-                android:padding="16dp"
-                android:layout_marginTop="16dp" />
+                android:background="@drawable/contact_button_background"
+                android:padding="12dp"
+                android:layout_marginTop="16dp"
+                android:drawableLeft="@drawable/ic_message_circle"
+                android:drawablePadding="2dp"
+                android:gravity="center" />
 
         </LinearLayout>
     </ScrollView>

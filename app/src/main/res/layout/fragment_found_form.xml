@@ -4,7 +4,7 @@
     android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/purple_500"
+    android:background="@color/white"
     android:padding="24dp">
 
     <LinearLayout
@@ -19,7 +19,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@android:color/white"
-            android:elevation="8dp"
             android:padding="24dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="24dp"

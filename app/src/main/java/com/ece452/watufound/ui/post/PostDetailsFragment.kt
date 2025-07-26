@@ -98,11 +98,12 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             android.util.Log.d("PostDetailsFragment", "This is the current user's post")
             buttonContact.isEnabled = false
             buttonContact.text = "Your Post"
-            buttonContact.setBackgroundColor(requireContext().getColor(android.R.color.darker_gray))
+            buttonContact.setBackgroundResource(R.drawable.contact_button_disabled_background)
+            buttonContact.setCompoundDrawables(null, null, null, null)
         } else {
             android.util.Log.d("PostDetailsFragment", "This is another user's post")
-            // Set contact button text based on anonymity
-            buttonContact.text = if (isAnonymous == true) "Contact Anonymous" else "Contact $userName"
+            // Set contact button text to "Start Conversation"
+            buttonContact.text = "Start Conversation"
         }
         
         // Populate data based on post type
@@ -120,6 +121,9 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 toolbar.title = "Found Item Details"
             }
         }
+        
+        // Set toolbar title text color to black for light theme
+        toolbar.setTitleTextColor(requireContext().getColor(R.color.black))
         
         // Set the data
         tagCategory.text = category
@@ -153,6 +157,8 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             if (currentUser.uid == userId) {
                 buttonContact.isEnabled = false
                 buttonContact.text = "Your Post"
+                buttonContact.setBackgroundResource(R.drawable.contact_button_disabled_background)
+                buttonContact.setCompoundDrawables(null, null, null, null)
                 return@setOnClickListener
             }
             val posterName = if (isAnonymous == true) "Anonymous" else userName

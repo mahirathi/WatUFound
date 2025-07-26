@@ -31,16 +31,6 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        binding.forgotPasswordText.setOnClickListener {
-            val email = binding.emailEditText.text.toString().trim()
-            Log.d("ForgotPassword", "Email entered: $email")
-            if (email.isEmpty()) {
-                Toast.makeText(this, "Please enter your email to reset password.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            forgotPassword(email)
-        }
-
     }
 
     private fun loginUser(email: String, password: String) {
@@ -51,17 +41,6 @@ class LoginActivity : AppCompatActivity() {
                     goToMain()
                 } else {
                     Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-    }
-
-    private fun forgotPassword(email: String) {
-        auth.sendPasswordResetEmail(email)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Toast.makeText(this, "Password reset email sent.", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
     }
