@@ -57,7 +57,10 @@ class HomeViewModel : ViewModel() {
                     val item = doc.toObject(LostItem::class.java)
                     val isAnonymous = raw?.get("isAnonymous") as? Boolean ?: false
                     if (item != null) {
-                        val fixedItem = item.copy(isAnonymous = isAnonymous)
+                        val fixedItem = item.copy(
+                            documentId = doc.id,
+                            isAnonymous = isAnonymous
+                        )
                         android.util.Log.d("HomeViewModel", " LOST Item is: $fixedItem")
                         FeedItem.Lost(fixedItem)
                     } else null
@@ -70,7 +73,10 @@ class HomeViewModel : ViewModel() {
                     val item = doc.toObject(FoundItem::class.java)
                     val isAnonymous = raw?.get("isAnonymous") as? Boolean ?: false
                     if (item != null) {
-                        val fixedItem = item.copy(isAnonymous = isAnonymous)
+                        val fixedItem = item.copy(
+                            documentId = doc.id,
+                            isAnonymous = isAnonymous
+                        )
                         android.util.Log.d("HomeViewModel", "FOUND Item is: $fixedItem")
                         FeedItem.Found(fixedItem)
                     } else null

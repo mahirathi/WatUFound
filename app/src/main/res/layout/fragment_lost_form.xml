@@ -160,7 +160,9 @@
                 android:layout_height="wrap_content"
                 android:text="Upload Image"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="@color/purple_500"
+                android:textColor="@android:color/white" />
 
             <!-- Submit Button -->
             <Button
@@ -170,8 +172,9 @@
                 android:text="Post Lost Item"
                 android:backgroundTint="@color/purple_500"
                 android:textColor="@android:color/white"
-                android:textAllCaps="false"
+                android:textAllCaps="true"
                 android:layout_marginTop="24dp"
+                android:layout_marginBottom="30dp"
                 android:padding="12dp" />
         </LinearLayout>
     </LinearLayout>

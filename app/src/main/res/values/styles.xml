@@ -50,4 +50,37 @@
         <item name="android:background">@drawable/tab_button_selected_background</item>
         <item name="android:textColor">@color/tab_text_selected</item>
     </style>
+
+    <!-- Purple Date Picker Dialog Theme -->
+    <style name="PurpleDatePickerDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/purple_500</item>
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_500</item>
+        <item name="android:colorAccent">@color/purple_500</item>
+        <item name="android:colorPrimary">@color/purple_500</item>
+        <item name="android:colorPrimaryDark">@color/purple_500</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/PurpleDialogButton</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/PurpleDialogButton</item>
+        <item name="android:buttonBarNeutralButtonStyle">@style/PurpleDialogButton</item>
+    </style>
+
+    <!-- Purple Time Picker Dialog Theme -->
+    <style name="PurpleTimePickerDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/purple_500</item>
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_500</item>
+        <item name="android:colorAccent">@color/purple_500</item>
+        <item name="android:colorPrimary">@color/purple_500</item>
+        <item name="android:colorPrimaryDark">@color/purple_500</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/PurpleDialogButton</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/PurpleDialogButton</item>
+        <item name="android:buttonBarNeutralButtonStyle">@style/PurpleDialogButton</item>
+    </style>
+
+    <!-- Purple Dialog Button Style -->
+    <style name="PurpleDialogButton" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/purple_500</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

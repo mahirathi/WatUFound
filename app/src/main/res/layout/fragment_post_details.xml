@@ -45,6 +45,7 @@
                 android:adjustViewBounds="true"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/rounded_card_background"
+                android:clipToOutline="true"
                 android:contentDescription="Post image preview"
                 android:visibility="gone" />
 
@@ -151,11 +152,19 @@
                 android:layout_marginBottom="24dp" />
 
             <!-- Map Preview -->
-            <com.google.android.gms.maps.MapView
-                android:id="@+id/mapViewPreview"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:layout_marginBottom="24dp" />
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/rounded_card_background"
+                android:clipToOutline="true">
+
+                <com.google.android.gms.maps.MapView
+                    android:id="@+id/mapViewPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </FrameLayout>
 
             <TextView
                 android:layout_width="match_parent"
@@ -175,19 +184,36 @@
                 android:textColor="#444444"
                 android:layout_marginBottom="24dp" />
 
-            <Button
+            <LinearLayout
                 android:id="@+id/buttonContact"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Start Conversation"
-                android:textSize="12sp"
-                android:textColor="@color/white"
+                android:orientation="horizontal"
+                android:gravity="center"
                 android:background="@drawable/contact_button_background"
                 android:padding="12dp"
                 android:layout_marginTop="16dp"
-                android:drawableLeft="@drawable/ic_message_circle"
-                android:drawablePadding="2dp"
-                android:gravity="center" />
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/chatIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_message_circle"
+                    android:layout_marginEnd="14dp"
+                    android:contentDescription="Message icon" />
+
+                <TextView
+                    android:id="@+id/buttonContactText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Start Conversation"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
