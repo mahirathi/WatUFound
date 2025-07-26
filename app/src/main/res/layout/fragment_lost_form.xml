@@ -4,7 +4,7 @@
     android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/purple_500"
+    android:background="@color/white"
     android:padding="24dp">
 
     <LinearLayout
@@ -19,7 +19,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@android:color/white"
-            android:elevation="8dp"
             android:padding="24dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="24dp"
@@ -151,15 +150,18 @@
                 android:layout_height="wrap_content"
                 android:text="Upload Image"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="@color/purple_500"
+                android:textColor="@android:color/white" />
 
             <!-- Post as Anonymous Switch -->
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp">
                 <Switch
@@ -167,7 +169,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:layout_marginEnd="12dp" />
+                    android:layout_marginEnd="12dp"
+                    android:theme="@style/PurpleSwitchTheme" />
 
                 <TextView
                     style="@style/TextLabel"
@@ -185,8 +188,9 @@
                 android:text="Post Lost Item"
                 android:backgroundTint="@color/purple_500"
                 android:textColor="@android:color/white"
-                android:textAllCaps="false"
+                android:textAllCaps="true"
                 android:layout_marginTop="24dp"
+                android:layout_marginBottom="30dp"
                 android:padding="12dp" />
         </LinearLayout>
     </LinearLayout>

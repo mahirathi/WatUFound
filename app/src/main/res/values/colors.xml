@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_500">#3700b3</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
@@ -11,10 +11,17 @@
     <color name="darker_gray">#EAA9A9A9</color>
     <color name="blue_500">#FF2196F3</color>
     <color name="gray_200">#FFEEEEEE</color>
+    <color name="gray_300">#FFE0E0E0</color>
+
     <color name="blue">#1A73E8</color>
     <!-- Feed background -->
     <color name="feed_background">#f9fafb</color>
     
+    <!-- Tab switcher colors -->
+    <color name="tab_background">#f3f4f6</color>
+    <color name="tab_text_unselected">#6b7280</color>
+    <color name="tab_text_selected">#3700B3</color>
+
     <!-- Lost item colors -->
     <color name="lost_text">#b91c1c</color>
     <color name="lost_background">#fee2e2</color>

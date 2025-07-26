@@ -26,6 +26,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import java.text.SimpleDateFormat
 import java.util.Locale
+import android.widget.LinearLayout
 
 class PostDetailsFragment : Fragment(), OnMapReadyCallback {
     private var mapView: MapView? = null
@@ -67,6 +68,10 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         val buttonDelete: Button = view.findViewById(R.id.buttonDelete)
         val textResolved: TextView = view.findViewById(R.id.textResolved)
                 // Ensure button is visible
+        val buttonContact: LinearLayout = view.findViewById(R.id.buttonContact)
+        val buttonContactText: TextView = buttonContact.findViewById(R.id.buttonContactText)
+
+        // Ensure button is visible
         buttonContact.visibility = View.VISIBLE
         
         // Set up toolbar
@@ -77,6 +82,7 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         
         // Get arguments from bundle
         val postType = arguments?.getString("postType")
+        val postId = arguments?.getString("postId", "")
         val itemTitle = arguments?.getString("itemTitle", "")
         val description = arguments?.getString("description", "")
         val category = arguments?.getString("category", "")
@@ -88,7 +94,7 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         val imageUrl = arguments?.getString("imageUrl")
         val roomNumber = arguments?.getString("roomNumber", "")
         val dateTimeCreated = arguments?.getString("dateTimeCreated", "")
-        
+
         // Check if post is resolved (we'll need to check this from Firestore)
         checkIfPostIsResolved(postType, itemTitle, userId, dateTimeCreated) { isResolved ->
             if (isResolved) {
@@ -111,13 +117,14 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
-        
+
         // Load image if available
         if (!imageUrl.isNullOrBlank()) {
             imagePost.visibility = View.VISIBLE
             Glide.with(requireContext())
                 .load(imageUrl)
-                .placeholder(R.drawable.ic_launcher_foreground)
+                .placeholder(R.drawable.rounded_card_background)
+                .error(R.drawable.rounded_card_background)
                 .centerCrop()
                 .into(imagePost)
         } else {
@@ -132,7 +139,7 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             textRoom.visibility = View.GONE
             labelRoom.visibility = View.GONE
         }
-        
+
         // Debug logging
         android.util.Log.d("PostDetailsFragment", "Received data - userId: '$userId', userName: '$userName'")
         android.util.Log.d("PostDetailsFragment", "Arguments: $arguments")
@@ -145,6 +152,12 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         if (currentUser?.uid == userId) {
             android.util.Log.d("PostDetailsFragment", "This is the current user's post")
             buttonContact.isEnabled = false
+            buttonContactText.text = "Your Post"
+            buttonContact.setBackgroundResource(R.drawable.contact_button_disabled_background)
+
+            // Hide the chat icon for "Your Post" button
+            val chatIcon = buttonContact.findViewById<android.widget.ImageView>(R.id.chatIcon)
+            chatIcon?.visibility = android.view.View.GONE
             buttonContact.text = "Your Post"
             buttonContact.setBackgroundColor(requireContext().getColor(android.R.color.darker_gray))
             // Action buttons visibility will be handled by the resolved check
@@ -154,6 +167,12 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             buttonContact.text = if (isAnonymous == true) "Contact Anonymous" else "Contact $userName"
             // Hide action buttons for other users' posts
             layoutActionButtons.visibility = View.GONE
+            // Set contact button text to "Start Conversation"
+            buttonContactText.text = "Start Conversation"
+
+            // Show the chat icon for "Start Conversation" button
+            val chatIcon = buttonContact.findViewById<android.widget.ImageView>(R.id.chatIcon)
+            chatIcon?.visibility = android.view.View.VISIBLE
         }
         
         // Populate data based on post type
@@ -174,6 +193,9 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             }
         }
         
+        // Set toolbar title text color to black for light theme
+        toolbar.setTitleTextColor(requireContext().getColor(R.color.black))
+
         // Set the data
         tagCategory.text = category
         tagCategory.setBackgroundResource(R.drawable.tag_category_bg)
@@ -183,7 +205,7 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         locationName = building
         textBuilding.text = building
         textDateTimeCreated.text = TimeUtils.getRelativeTimeAgo(dateTimeCreated ?: "")
-        
+
         // Format the date/time in the desired format
         textDateTime.text = formatDateTime(dateTime ?: "")
         
@@ -208,12 +230,21 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             }
             if (currentUser.uid == userId) {
                 buttonContact.isEnabled = false
-                buttonContact.text = "Your Post"
+                buttonContactText.text = "Your Post"
+                buttonContact.setBackgroundResource(R.drawable.contact_button_disabled_background)
+
+                // Hide the chat icon for "Your Post" button
+                val chatIcon = buttonContact.findViewById<android.widget.ImageView>(R.id.chatIcon)
+                chatIcon?.visibility = android.view.View.GONE
                 return@setOnClickListener
             }
             val posterName = if (isAnonymous == true) "Anonymous" else userName
             val postTitleForConv = itemTitle
             val db = FirebaseDatabase.getInstance().reference
+
+            // Debug logging for image URL
+            android.util.Log.d("PostDetailsFragment", "Creating conversation with imageUrl: '$imageUrl'")
+
             val userConversationsRef = db.child("userConversations").child(currentUser.uid)
             userConversationsRef.get().addOnSuccessListener { snapshot ->
                 var existingConversationId: String? = null
@@ -227,16 +258,23 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 }
                 val conversationId = existingConversationId ?: if (isAnonymous == true) java.util.UUID.randomUUID().toString() else "${currentUser.uid}_${userId}_${postTitleForConv}"
                 if (existingConversationId == null) {
+                    val currentTime = System.currentTimeMillis()
                     val metaForCurrentUser = mapOf(
                         "conversationId" to conversationId,
                         "posterName" to posterName,
-                        "postTitle" to postTitleForConv
+                        "postTitle" to postTitleForConv,
+                        "postImageUrl" to (imageUrl ?: ""),
+                        "postId" to postId,
+                        "createdAt" to currentTime
                     )
                     val senderName = currentUser.displayName ?: currentUser.email ?: "You"
                     val metaForPoster = mapOf(
                         "conversationId" to conversationId,
                         "posterName" to senderName,
-                        "postTitle" to postTitleForConv
+                        "postTitle" to postTitleForConv,
+                        "postImageUrl" to (imageUrl ?: ""),
+                        "postId" to postId,
+                        "createdAt" to currentTime
                     )
                     db.child("userConversations").child(currentUser.uid).child(conversationId).setValue(metaForCurrentUser)
                     db.child("userConversations").child(userId).child(conversationId).setValue(metaForPoster)
@@ -245,6 +283,8 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                     putString("otherUserId", userId)
                     putString("otherUserName", posterName)
                     putString("postTitle", postTitleForConv)
+                    putString("postId", postId)
+                    putString("postImageUrl", imageUrl ?: "")
                     putString("conversationId", conversationId)
                     if (isAnonymous == true) {
                         putString("anonConversationId", conversationId)
@@ -253,12 +293,12 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 findNavController().navigate(R.id.navigation_conversation, bundle)
             }
         }
-        
+
         // Set up resolve and delete button click listeners
         buttonResolve.setOnClickListener {
             handleResolvePost(postType, itemTitle, userId, dateTimeCreated)
         }
-        
+
         buttonDelete.setOnClickListener {
             handleDeletePost(postType, itemTitle, userId, dateTimeCreated)
         }
@@ -351,17 +391,17 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 return
             }
         }
-        
+
         if (itemTitle.isNullOrEmpty() || userId.isNullOrEmpty() || dateTimeCreated.isNullOrEmpty()) {
             callback(false)
             return
         }
-        
+
         val query = db.collection(collectionName)
             .whereEqualTo("itemTitle", itemTitle)
             .whereEqualTo("userId", userId)
             .whereEqualTo("dateCreated", dateTimeCreated)
-        
+
         query.get().addOnSuccessListener { documents ->
             if (!documents.isEmpty) {
                 val document = documents.documents[0]
@@ -406,17 +446,17 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             "found" -> "found_items"
             else -> return
         }
-        
+
         if (itemTitle.isNullOrEmpty() || userId.isNullOrEmpty() || dateTimeCreated.isNullOrEmpty()) {
             android.util.Log.e("PostDetailsFragment", "Missing required data for resolve")
             return
         }
-        
+
         val query = db.collection(collectionName)
             .whereEqualTo("itemTitle", itemTitle)
             .whereEqualTo("userId", userId)
             .whereEqualTo("dateCreated", dateTimeCreated)
-        
+
         query.get().addOnSuccessListener { documents ->
             if (!documents.isEmpty) {
                 val document = documents.documents[0]
@@ -440,17 +480,17 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             "found" -> "found_items"
             else -> return
         }
-        
+
         if (itemTitle.isNullOrEmpty() || userId.isNullOrEmpty() || dateTimeCreated.isNullOrEmpty()) {
             android.util.Log.e("PostDetailsFragment", "Missing required data for delete")
             return
         }
-        
+
         val query = db.collection(collectionName)
             .whereEqualTo("itemTitle", itemTitle)
             .whereEqualTo("userId", userId)
             .whereEqualTo("dateCreated", dateTimeCreated)
-        
+
         query.get().addOnSuccessListener { documents ->
             if (!documents.isEmpty) {
                 val document = documents.documents[0]

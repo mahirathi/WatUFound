@@ -47,6 +47,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
             val bundle = when (item) {
                 is FeedItem.Lost -> Bundle().apply {
                     putString("postType", "lost")
+                    putString("postId", item.item.documentId)
                     putString("itemTitle", item.item.itemTitle)
                     putString("description", item.item.description)
                     putString("category", item.item.category)
@@ -61,6 +62,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                 }
                 is FeedItem.Found -> Bundle().apply {
                     putString("postType", "found")
+                    putString("postId", item.item.documentId)
                     putString("itemTitle", item.item.itemTitle)
                     putString("description", item.item.description)
                     putString("category", item.item.category)
@@ -111,7 +113,8 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                 imagePost.visibility = View.VISIBLE
                 Glide.with(itemView.context)
                     .load(imageUrl)
-                    .placeholder(R.drawable.ic_launcher_foreground)
+                    .placeholder(R.drawable.rounded_card_background)
+                    .error(R.drawable.rounded_card_background)
                     .centerCrop()
                     .into(imagePost)
             } else {

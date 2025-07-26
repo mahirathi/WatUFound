@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textColor="@color/black"
-            android:textSize="10sp"
+            android:textSize="12sp"
             tools:text="12:34" />
 
     </LinearLayout>
