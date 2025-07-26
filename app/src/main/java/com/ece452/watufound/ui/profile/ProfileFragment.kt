@@ -103,13 +103,10 @@ class ProfileFragment : Fragment() {
         
         Toast.makeText(requireContext(), "Signed out successfully", Toast.LENGTH_SHORT).show()
         
-        // Navigate to login activity
-        //val intent = Intent(requireContext(), LoginActivity::class.java)
-        //intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        //startActivity(intent)
-
-        startActivity(Intent(requireContext(), LoginActivity::class.java))
-
+        // Navigate to login activity and clear the activity stack
+        val intent = Intent(requireContext(), LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
     }
 
 //    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

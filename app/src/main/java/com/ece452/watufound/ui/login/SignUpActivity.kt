@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.ece452.watufound.MainActivity
 import com.ece452.watufound.databinding.ActivitySignupBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -94,8 +95,10 @@ class SignUpActivity : AppCompatActivity() {
                                 }
                             // End of extractable
 
-
-                            startActivity(Intent(this, LoginActivity::class.java))
+                            // Redirect to MainActivity since user is already authenticated
+                            val intent = Intent(this, MainActivity::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(intent)
                             finish()
                         }
                     } else {
