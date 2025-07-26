@@ -45,21 +45,7 @@ class ConversationsFragment : Fragment() {
                 android.util.Log.d("ConversationsFragment", "Navigating to conversation: $bundle")
                 findNavController().navigate(R.id.navigation_conversation, bundle)
             },
-            onDeleteClick = { conversation ->
-                val currentUser = FirebaseAuth.getInstance().currentUser
-                if (currentUser != null) {
-                    android.app.AlertDialog.Builder(requireContext())
-                        .setTitle("Delete Conversation")
-                        .setMessage("Are you sure you want to delete this conversation with ${conversation.posterName} about '${conversation.postTitle}'?")
-                        .setPositiveButton("Delete") { _, _ ->
-                            val db = FirebaseDatabase.getInstance().reference
-                            db.child("userConversations").child(currentUser.uid).child(conversation.conversationId).removeValue()
-                        }
-                        .setNegativeButton("Cancel", null)
-                        .show()
-                }
-            },
-            showDeleteButton = true
+            showDeleteButton = false
         )
         binding.recyclerViewRecent.layoutManager = LinearLayoutManager(context)
         binding.recyclerViewRecent.adapter = conversationsAdapter

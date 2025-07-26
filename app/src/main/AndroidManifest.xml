@@ -12,17 +12,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WatUFound">
         <activity
-            android:name=".ui.login.LoginActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.login.SignUpActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.login.LoginActivity"
             android:exported="true" />
+        <activity android:name=".ui.login.SignUpActivity" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCfzaagfcQeQNHv4EFwJ7O2eWc_4hGAuuo"/>
