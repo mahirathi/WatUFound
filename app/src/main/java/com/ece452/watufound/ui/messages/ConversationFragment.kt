@@ -10,8 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.ece452.watufound.R
 import com.ece452.watufound.databinding.FragmentConversationBinding
+import com.google.firebase.firestore.FirebaseFirestore
 
 class ConversationFragment : Fragment() {
 
@@ -61,11 +63,22 @@ class ConversationFragment : Fragment() {
             val conversationId = arguments?.getString("conversationId")
             val otherUserName = arguments?.getString("otherUserName") ?: "Unknown"
             val postTitle = arguments?.getString("postTitle") ?: ""
+            val postImageUrl = arguments?.getString("postImageUrl") ?: ""
+            val postId = arguments?.getString("postId") ?: ""
+
+            Log.d("ConversationFragment", "=== RECEIVED ARGUMENTS ===")
+            Log.d("ConversationFragment", "conversationId: '$conversationId'")
+            Log.d("ConversationFragment", "otherUserName: '$otherUserName'")
+            Log.d("ConversationFragment", "postTitle: '$postTitle'")
+            Log.d("ConversationFragment", "postImageUrl: '$postImageUrl'")
+            Log.d("ConversationFragment", "postId: '$postId'")
+            Log.d("ConversationFragment", "==========================")
 
             // Set the conversation title and subtitle
             binding.textConversationTitle.text = if (otherUserName == "Anonymous") "Chat with Anonymous" else "Chat with $otherUserName"
-            // Optionally, show postTitle as a subtitle if you have a subtitle TextView
-            // binding.textConversationSubtitle.text = postTitle
+            
+            // Setup post preview
+            setupPostPreview(postTitle, postImageUrl, postId)
 
             // Hide action bar and bottom navigation
             hideSystemUI()
@@ -193,6 +206,243 @@ class ConversationFragment : Fragment() {
         } catch (e: Exception) {
             Log.e("ConversationFragment", "Error showing system UI", e)
         }
+    }
+
+    private fun setupPostPreview(postTitle: String, postImageUrl: String, postId: String) {
+        Log.d("ConversationFragment", "Setting up post preview: $postTitle, postId: $postId, imageUrl: $postImageUrl")
+        try {
+            // Set post title
+            binding.postPreviewTitle.text = postTitle
+            
+            // Load post image if available
+            if (postImageUrl.isNotEmpty()) {
+                Glide.with(this)
+                    .load(postImageUrl)
+                    .placeholder(R.drawable.rounded_image_background)
+                    .error(R.drawable.rounded_image_background)
+                    .into(binding.postPreviewImage)
+            } else {
+                binding.postPreviewImage.setImageResource(R.drawable.rounded_image_background)
+            }
+            
+            // Setup click listener to navigate to post details
+            binding.postPreviewLayout.setOnClickListener {
+                Log.d("ConversationFragment", "=== POST PREVIEW CLICKED ===")
+                Log.d("ConversationFragment", "postId: '$postId'")
+                Log.d("ConversationFragment", "postTitle: '$postTitle'")
+                Log.d("ConversationFragment", "postImageUrl: '$postImageUrl'")
+                
+                if (postId.isNotEmpty() && postId != postTitle) {
+                    Log.d("ConversationFragment", "Attempting to fetch post details for navigation: $postId")
+                    // Fetch post details from Firestore before navigating
+                    fetchPostDetailsAndNavigate(postId, postTitle, postImageUrl)
+                } else {
+                    Log.w("ConversationFragment", "No valid postId available, trying fallback navigation")
+                    Log.w("ConversationFragment", "postId.isEmpty(): ${postId.isEmpty()}")
+                    Log.w("ConversationFragment", "postId == postTitle: ${postId == postTitle}")
+                    // Fallback: try to navigate with just the title
+                    navigateWithFallback(postTitle, postImageUrl)
+                }
+            }
+            
+            Log.d("ConversationFragment", "Post preview setup successful")
+        } catch (e: Exception) {
+            Log.e("ConversationFragment", "Error setting up post preview", e)
+        }
+    }
+
+    private fun navigateWithFallback(postTitle: String, postImageUrl: String) {
+        Log.d("ConversationFragment", "=== FALLBACK NAVIGATION ===")
+        Log.d("ConversationFragment", "Using fallback navigation with title: '$postTitle'")
+        Log.d("ConversationFragment", "imageUrl: '$postImageUrl'")
+        
+        // Try to fetch post data by title since we don't have the document ID
+        val firestore = FirebaseFirestore.getInstance()
+        
+        // First try lost_items collection
+        firestore.collection("lost_items")
+            .whereEqualTo("itemTitle", postTitle)
+            .get()
+            .addOnSuccessListener { documents ->
+                Log.d("ConversationFragment", "Fallback: Found ${documents.size()} documents in lost_items")
+                if (!documents.isEmpty) {
+                    val document = documents.documents[0]
+                    Log.d("ConversationFragment", "Fallback: Post found in lost_items, navigating...")
+                    val bundle = Bundle().apply {
+                        putString("postType", "lost")
+                        putString("itemTitle", document.getString("itemTitle") ?: postTitle)
+                        putString("postId", document.id)
+                        putString("imageUrl", document.getString("imageUrl") ?: postImageUrl)
+                        putString("description", document.getString("description") ?: "")
+                        putString("category", document.getString("category") ?: "")
+                        putString("location", document.getString("lastSeenAt") ?: "")
+                        putString("dateTime", document.getString("dateCreated") ?: "")
+                        putString("userId", document.getString("userId") ?: "")
+                        putString("userName", document.getString("userName") ?: "")
+                        putBoolean("isAnonymous", document.getBoolean("isAnonymous") ?: false)
+                    }
+                    Log.d("ConversationFragment", "Fallback: Created bundle for lost item, navigating...")
+                    findNavController().navigate(R.id.navigation_post_details, bundle)
+                } else {
+                    // Try found_items collection
+                    firestore.collection("found_items")
+                        .whereEqualTo("itemTitle", postTitle)
+                        .get()
+                        .addOnSuccessListener { foundDocuments ->
+                            Log.d("ConversationFragment", "Fallback: Found ${foundDocuments.size()} documents in found_items")
+                            if (!foundDocuments.isEmpty) {
+                                val document = foundDocuments.documents[0]
+                                Log.d("ConversationFragment", "Fallback: Post found in found_items, navigating...")
+                                val bundle = Bundle().apply {
+                                    putString("postType", "found")
+                                    putString("itemTitle", document.getString("itemTitle") ?: postTitle)
+                                    putString("postId", document.id)
+                                    putString("imageUrl", document.getString("imageUrl") ?: postImageUrl)
+                                    putString("description", document.getString("description") ?: "")
+                                    putString("category", document.getString("category") ?: "")
+                                    putString("location", document.getString("foundAt") ?: "")
+                                    putString("dateTime", document.getString("dateCreated") ?: "")
+                                    putString("userId", document.getString("userId") ?: "")
+                                    putString("userName", document.getString("userName") ?: "")
+                                    putBoolean("isAnonymous", document.getBoolean("isAnonymous") ?: false)
+                                }
+                                Log.d("ConversationFragment", "Fallback: Created bundle for found item, navigating...")
+                                findNavController().navigate(R.id.navigation_post_details, bundle)
+                            } else {
+                                Log.w("ConversationFragment", "Fallback: Post not found in either collection by title: $postTitle")
+                                // Last resort: navigate with minimal data
+                                val bundle = Bundle().apply {
+                                    putString("postType", "lost")
+                                    putString("itemTitle", postTitle)
+                                    putString("postId", "")
+                                    putString("imageUrl", postImageUrl)
+                                    putString("description", "")
+                                    putString("category", "")
+                                    putString("location", "")
+                                    putString("dateTime", "")
+                                    putString("userId", "")
+                                    putString("userName", "")
+                                    putBoolean("isAnonymous", false)
+                                }
+                                Log.d("ConversationFragment", "Fallback: Using minimal bundle, navigating...")
+                                findNavController().navigate(R.id.navigation_post_details, bundle)
+                            }
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e("ConversationFragment", "Fallback: Error fetching from found_items", exception)
+                            // Last resort navigation
+                            val bundle = Bundle().apply {
+                                putString("postType", "lost")
+                                putString("itemTitle", postTitle)
+                                putString("postId", "")
+                                putString("imageUrl", postImageUrl)
+                                putString("description", "")
+                                putString("category", "")
+                                putString("location", "")
+                                putString("dateTime", "")
+                                putString("userId", "")
+                                putString("userName", "")
+                                putBoolean("isAnonymous", false)
+                            }
+                            findNavController().navigate(R.id.navigation_post_details, bundle)
+                        }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("ConversationFragment", "Fallback: Error fetching from lost_items", exception)
+                // Last resort navigation
+                val bundle = Bundle().apply {
+                    putString("postType", "lost")
+                    putString("itemTitle", postTitle)
+                    putString("postId", "")
+                    putString("imageUrl", postImageUrl)
+                    putString("description", "")
+                    putString("category", "")
+                    putString("location", "")
+                    putString("dateTime", "")
+                    putString("userId", "")
+                    putString("userName", "")
+                    putBoolean("isAnonymous", false)
+                }
+                findNavController().navigate(R.id.navigation_post_details, bundle)
+            }
+    }
+
+    private fun fetchPostDetailsAndNavigate(postId: String, postTitle: String, postImageUrl: String) {
+        Log.d("ConversationFragment", "Fetching post details for navigation: postId='$postId', postTitle='$postTitle'")
+        
+        if (postId.isEmpty()) {
+            Log.w("ConversationFragment", "No postId available, using fallback navigation")
+            navigateWithFallback(postTitle, postImageUrl)
+            return
+        }
+        
+        val firestore = FirebaseFirestore.getInstance()
+        
+        // Try to find the post by document ID in both collections
+        firestore.collection("lost_items")
+            .document(postId)
+            .get()
+            .addOnSuccessListener { document ->
+                Log.d("ConversationFragment", "Firestore query completed for lost_items, document exists: ${document.exists()}")
+                if (document.exists()) {
+                    Log.d("ConversationFragment", "Post found in lost_items, navigating...")
+                    val bundle = Bundle().apply {
+                        putString("postType", "lost")
+                        putString("itemTitle", document.getString("itemTitle") ?: postTitle)
+                        putString("postId", postId)
+                        putString("imageUrl", document.getString("imageUrl") ?: postImageUrl)
+                        putString("description", document.getString("description") ?: "")
+                        putString("category", document.getString("category") ?: "")
+                        putString("location", document.getString("lastSeenAt") ?: "")
+                        putString("dateTime", document.getString("dateCreated") ?: "")
+                        putString("userId", document.getString("userId") ?: "")
+                        putString("userName", document.getString("userName") ?: "")
+                        putBoolean("isAnonymous", document.getBoolean("isAnonymous") ?: false)
+                    }
+                    Log.d("ConversationFragment", "Created bundle for lost item, navigating...")
+                    findNavController().navigate(R.id.navigation_post_details, bundle)
+                } else {
+                    Log.d("ConversationFragment", "Post not found in lost_items, trying found_items...")
+                    // Try found_items collection
+                    firestore.collection("found_items")
+                        .document(postId)
+                        .get()
+                        .addOnSuccessListener { foundDocument ->
+                            Log.d("ConversationFragment", "Firestore query completed for found_items, document exists: ${foundDocument.exists()}")
+                            if (foundDocument.exists()) {
+                                Log.d("ConversationFragment", "Post found in found_items, navigating...")
+                                val bundle = Bundle().apply {
+                                    putString("postType", "found")
+                                    putString("itemTitle", foundDocument.getString("itemTitle") ?: postTitle)
+                                    putString("postId", postId)
+                                    putString("imageUrl", foundDocument.getString("imageUrl") ?: postImageUrl)
+                                    putString("description", foundDocument.getString("description") ?: "")
+                                    putString("category", foundDocument.getString("category") ?: "")
+                                    putString("location", foundDocument.getString("foundAt") ?: "")
+                                    putString("dateTime", foundDocument.getString("dateCreated") ?: "")
+                                    putString("userId", foundDocument.getString("userId") ?: "")
+                                    putString("userName", foundDocument.getString("userName") ?: "")
+                                    putBoolean("isAnonymous", foundDocument.getBoolean("isAnonymous") ?: false)
+                                }
+                                Log.d("ConversationFragment", "Created bundle for found item, navigating...")
+                                findNavController().navigate(R.id.navigation_post_details, bundle)
+                            } else {
+                                Log.w("ConversationFragment", "Post not found in either collection by ID: $postId")
+                                // Fallback: navigate with available data
+                                navigateWithFallback(postTitle, postImageUrl)
+                            }
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e("ConversationFragment", "Error fetching from found_items", exception)
+                            navigateWithFallback(postTitle, postImageUrl)
+                        }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("ConversationFragment", "Error fetching from lost_items", exception)
+                navigateWithFallback(postTitle, postImageUrl)
+            }
     }
 
     override fun onDestroyView() {

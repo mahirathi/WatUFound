@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.ece452.watufound.utils.BuildingLocationUtils
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import android.widget.LinearLayout
 
 class PostDetailsFragment : Fragment(), OnMapReadyCallback {
     private var mapView: MapView? = null
@@ -53,9 +54,10 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         val textLocation: TextView = view.findViewById(R.id.textLocation)
         val textDateTime: TextView = view.findViewById(R.id.textDateTime)
         val textPostedBy: TextView = view.findViewById(R.id.textPostedBy)
-        val buttonContact: Button = view.findViewById(R.id.buttonContact)
+        val buttonContact: LinearLayout = view.findViewById(R.id.buttonContact)
+        val buttonContactText: TextView = buttonContact.findViewById(R.id.buttonContactText)
         
-                // Ensure button is visible
+        // Ensure button is visible
         buttonContact.visibility = View.VISIBLE
         
         // Set up toolbar
@@ -66,6 +68,7 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         
         // Get arguments from bundle
         val postType = arguments?.getString("postType")
+        val postId = arguments?.getString("postId", "")
         val itemTitle = arguments?.getString("itemTitle", "")
         val description = arguments?.getString("description", "")
         val category = arguments?.getString("category", "")
@@ -81,7 +84,8 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             imagePost.visibility = View.VISIBLE
             Glide.with(requireContext())
                 .load(imageUrl)
-                .placeholder(R.drawable.ic_launcher_foreground)
+                .placeholder(R.drawable.rounded_card_background)
+                .error(R.drawable.rounded_card_background)
                 .centerCrop()
                 .into(imagePost)
         } else {
@@ -100,12 +104,20 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         if (currentUser?.uid == userId) {
             android.util.Log.d("PostDetailsFragment", "This is the current user's post")
             buttonContact.isEnabled = false
-            buttonContact.text = "Your Post"
-            buttonContact.setBackgroundColor(requireContext().getColor(android.R.color.darker_gray))
+            buttonContactText.text = "Your Post"
+            buttonContact.setBackgroundResource(R.drawable.contact_button_disabled_background)
+            
+            // Hide the chat icon for "Your Post" button
+            val chatIcon = buttonContact.findViewById<android.widget.ImageView>(R.id.chatIcon)
+            chatIcon?.visibility = android.view.View.GONE
         } else {
             android.util.Log.d("PostDetailsFragment", "This is another user's post")
-            // Set contact button text based on anonymity
-            buttonContact.text = if (isAnonymous == true) "Contact Anonymous" else "Contact $userName"
+            // Set contact button text to "Start Conversation"
+            buttonContactText.text = "Start Conversation"
+            
+            // Show the chat icon for "Start Conversation" button
+            val chatIcon = buttonContact.findViewById<android.widget.ImageView>(R.id.chatIcon)
+            chatIcon?.visibility = android.view.View.VISIBLE
         }
         
         // Populate data based on post type
@@ -123,6 +135,9 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 toolbar.title = "Found Item Details"
             }
         }
+        
+        // Set toolbar title text color to black for light theme
+        toolbar.setTitleTextColor(requireContext().getColor(R.color.black))
         
         // Set the data
         tagCategory.text = category
@@ -155,12 +170,21 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             }
             if (currentUser.uid == userId) {
                 buttonContact.isEnabled = false
-                buttonContact.text = "Your Post"
+                buttonContactText.text = "Your Post"
+                buttonContact.setBackgroundResource(R.drawable.contact_button_disabled_background)
+                
+                // Hide the chat icon for "Your Post" button
+                val chatIcon = buttonContact.findViewById<android.widget.ImageView>(R.id.chatIcon)
+                chatIcon?.visibility = android.view.View.GONE
                 return@setOnClickListener
             }
             val posterName = if (isAnonymous == true) "Anonymous" else userName
             val postTitleForConv = itemTitle
             val db = FirebaseDatabase.getInstance().reference
+            
+            // Debug logging for image URL
+            android.util.Log.d("PostDetailsFragment", "Creating conversation with imageUrl: '$imageUrl'")
+            
             val userConversationsRef = db.child("userConversations").child(currentUser.uid)
             userConversationsRef.get().addOnSuccessListener { snapshot ->
                 var existingConversationId: String? = null
@@ -174,16 +198,23 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 }
                 val conversationId = existingConversationId ?: if (isAnonymous == true) java.util.UUID.randomUUID().toString() else "${currentUser.uid}_${userId}_${postTitleForConv}"
                 if (existingConversationId == null) {
+                    val currentTime = System.currentTimeMillis()
                     val metaForCurrentUser = mapOf(
                         "conversationId" to conversationId,
                         "posterName" to posterName,
-                        "postTitle" to postTitleForConv
+                        "postTitle" to postTitleForConv,
+                        "postImageUrl" to (imageUrl ?: ""),
+                        "postId" to postId,
+                        "createdAt" to currentTime
                     )
                     val senderName = currentUser.displayName ?: currentUser.email ?: "You"
                     val metaForPoster = mapOf(
                         "conversationId" to conversationId,
                         "posterName" to senderName,
-                        "postTitle" to postTitleForConv
+                        "postTitle" to postTitleForConv,
+                        "postImageUrl" to (imageUrl ?: ""),
+                        "postId" to postId,
+                        "createdAt" to currentTime
                     )
                     db.child("userConversations").child(currentUser.uid).child(conversationId).setValue(metaForCurrentUser)
                     db.child("userConversations").child(userId).child(conversationId).setValue(metaForPoster)
@@ -192,6 +223,8 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                     putString("otherUserId", userId)
                     putString("otherUserName", posterName)
                     putString("postTitle", postTitleForConv)
+                    putString("postId", postId)
+                    putString("postImageUrl", imageUrl ?: "")
                     putString("conversationId", conversationId)
                     if (isAnonymous == true) {
                         putString("anonConversationId", conversationId)
