@@ -68,6 +68,7 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupSpinners()
+        checkUserBanStatus()
 
         // Date & Time Picker
         binding.dateTimeInput.setOnClickListener {
@@ -176,7 +177,11 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
                     dateCreated = sdf.format(Date()),
                     isAnonymous = isAnonymous
                 ),
-                selectedImageUri // Pass the image URI
+                selectedImageUri, // Pass the image URI
+                onBanned = {
+                    // Handle banned user
+                    Toast.makeText(requireContext(), "You are banned from posting. Please contact an administrator.", Toast.LENGTH_LONG).show()
+                }
             )
 
             Toast.makeText(requireContext(), "Posting your found item...", Toast.LENGTH_SHORT).show()
@@ -333,6 +338,48 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
         // If a location was already selected, show it
         val location = binding.foundAtInput.text.toString()
         updateMapForLocation(location)
+    }
+
+    private fun checkUserBanStatus() {
+        val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+        if (currentUser == null) return
+
+        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        db.collection("users").document(currentUser.uid).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val isBanned = document.getBoolean("isBanned") ?: false
+                    if (isBanned) {
+                        // User is banned - disable form and show ban message
+                        disableFormForBannedUser()
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                android.util.Log.e("FoundFormFragment", "Failed to check ban status", exception)
+            }
+    }
+
+    private fun disableFormForBannedUser() {
+        // Disable all form inputs
+        binding.itemTitleInput.isEnabled = false
+        binding.descriptionInput.isEnabled = false
+        binding.categorySpinner.isEnabled = false
+        binding.foundAtInput.isEnabled = false
+        binding.roomNumberInput.text?.clear()
+        binding.roomNumberInput.isEnabled = false
+        binding.dateTimeInput.isEnabled = false
+        binding.buttonSelectImage.isEnabled = false
+        binding.switchAnonymous.isEnabled = false
+        
+        // Disable submit button and change its appearance
+        binding.submitButton.isEnabled = false
+        binding.submitButton.setBackgroundColor(requireContext().getColor(android.R.color.darker_gray))
+        binding.submitButton.text = "POSTING DISABLED - PLEASEE CONTACT ADMINISTRATOR"
+        
+        // Show ban message
+        val banMessage = "You are banned from posting. Please contact an administrator for assistance."
+        android.widget.Toast.makeText(requireContext(), banMessage, android.widget.Toast.LENGTH_LONG).show()
     }
 
     private fun clearForm() {

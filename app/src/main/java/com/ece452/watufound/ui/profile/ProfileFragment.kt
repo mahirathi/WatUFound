@@ -94,6 +94,24 @@ class ProfileFragment : Fragment() {
             signOut()
         }
 
+        // Check if user is admin and show admin access
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val isAdmin = currentUser?.email?.endsWith("@admin.watufound.com") == true ||
+                     currentUser?.email == "admin@watufound.com"
+        
+        if (isAdmin) {
+            // Show the new prominent admin dashboard button
+            val adminDashboardButton = root.findViewById<LinearLayout>(R.id.adminDashboardButton)
+            adminDashboardButton?.visibility = View.VISIBLE
+            adminDashboardButton?.setOnClickListener {
+                findNavController().navigate(R.id.navigation_admin_dashboard)
+            }
+            
+            // Hide the old admin access option
+            val adminAccessOption = root.findViewById<LinearLayout>(R.id.adminAccessOption)
+            adminAccessOption?.visibility = View.GONE
+        }
+
         return root
     }
 

@@ -24,7 +24,7 @@ class ConversationsAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConversationViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.item_user, parent, false)
+        val view = inflater.inflate(R.layout.item_conversation, parent, false)
         return ConversationViewHolder(view, onConversationClick, onDeleteClick, showDeleteButton)
     }
 
