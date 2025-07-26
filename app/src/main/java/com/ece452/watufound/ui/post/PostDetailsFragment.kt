@@ -22,6 +22,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.ece452.watufound.utils.BuildingLocationUtils
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class PostDetailsFragment : Fragment(), OnMapReadyCallback {
     private var mapView: MapView? = null
@@ -56,7 +58,8 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         val textDateTime: TextView = view.findViewById(R.id.textDateTime)
         val textPostedBy: TextView = view.findViewById(R.id.textPostedBy)
         val buttonContact: Button = view.findViewById(R.id.buttonContact)
-        
+        val labelDateTime: TextView = view.findViewById(R.id.labelDateTime)
+        val textDateTimeCreated: TextView = view.findViewById(R.id.textDateTimeCreated)
                 // Ensure button is visible
         buttonContact.visibility = View.VISIBLE
         
@@ -78,6 +81,7 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         val isAnonymous = arguments?.getBoolean("isAnonymous")
         val imageUrl = arguments?.getString("imageUrl")
         val roomNumber = arguments?.getString("roomNumber", "")
+        val dateTimeCreated = arguments?.getString("dateTimeCreated", "")
         // Load image if available
         if (!imageUrl.isNullOrBlank()) {
             imagePost.visibility = View.VISIBLE
@@ -126,12 +130,14 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 tagStatus.setBackgroundResource(R.drawable.tag_lost_bg)
                 tagStatus.setTextColor(requireContext().getColor(R.color.lost_text))
                 toolbar.title = "Lost Item Details"
+                labelDateTime.text = "Reported Lost at"
             }
             "found" -> {
                 tagStatus.text = "Found"
                 tagStatus.setBackgroundResource(R.drawable.tag_found_bg)
                 tagStatus.setTextColor(requireContext().getColor(R.color.found_text))
                 toolbar.title = "Found Item Details"
+                labelDateTime.text = "Time Posted"
             }
         }
         
@@ -143,7 +149,10 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         textDescription.text = description
         locationName = building
         textBuilding.text = building
-        textDateTime.text = TimeUtils.getRelativeTimeAgo(dateTime ?: "")
+        textDateTimeCreated.text = TimeUtils.getRelativeTimeAgo(dateTimeCreated ?: "")
+        
+        // Format the date/time in the desired format
+        textDateTime.text = formatDateTime(dateTime ?: "")
         
         // Set up contact button
         buttonContact.setOnClickListener {
@@ -210,6 +219,21 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 }
                 findNavController().navigate(R.id.navigation_conversation, bundle)
             }
+        }
+    }
+
+    private fun formatDateTime(dateTimeString: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm", Locale.getDefault())
+            val date = inputFormat.parse(dateTimeString)
+            if (date != null) {
+                val outputFormat = SimpleDateFormat("MMMM dd, yyyy 'at' h:mm a", Locale.getDefault())
+                outputFormat.format(date)
+            } else {
+                dateTimeString // Return original if parsing fails
+            }
+        } catch (e: Exception) {
+            dateTimeString // Return original if parsing fails
         }
     }
 
