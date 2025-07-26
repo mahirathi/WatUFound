@@ -86,13 +86,26 @@
                 android:id="@+id/foundAtInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Select location"
+                android:hint="eg: Engineering 7 (E7)"
                 android:inputType="text"
                 android:background="@drawable/input_field_background"
                 android:padding="12dp"
                 android:layout_marginBottom="16dp"
                 android:dropDownHeight="200dp"
                 android:completionThreshold="1" />
+
+            <!-- Room Number -->
+            <TextView
+                style="@style/TextLabel"
+                android:text="Room Number" />
+
+            <EditText
+                android:id="@+id/roomNumberInput"
+                style="@style/InputField"
+                android:hint="e.g: E7-4452"
+                android:inputType="text"
+                android:layout_marginBottom="16dp" />
+
 
             <!-- Map Preview -->
             <com.google.android.gms.maps.MapView
@@ -114,26 +127,6 @@
                 android:clickable="true"
                 android:inputType="none" />
 
-            <!-- Post as Anonymous Switch -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp">
-                <Switch
-                    android:id="@+id/switch_anonymous"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:layout_marginEnd="12dp" />
-                <TextView
-                    style="@style/TextLabel"
-                    android:text="Post anonymously"
-                    android:layout_marginTop="0dp"
-                    android:layout_marginBottom="0dp" />
-            </LinearLayout>
 
             <!-- Image Upload Preview -->
             <ImageView
@@ -158,6 +151,27 @@
                 android:layout_marginBottom="16dp"
                 android:backgroundTint="@color/purple_500"
                 android:textColor="@android:color/white" />
+
+            <!-- Post as Anonymous Switch -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp">
+                <Switch
+                    android:id="@+id/switch_anonymous"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:layout_marginEnd="12dp" />
+                <TextView
+                    style="@style/TextLabel"
+                    android:text="Post anonymously"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginBottom="0dp" />
+            </LinearLayout>
 
             <!-- Submit Button -->
             <Button

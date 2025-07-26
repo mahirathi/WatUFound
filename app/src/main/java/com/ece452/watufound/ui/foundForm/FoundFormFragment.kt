@@ -145,11 +145,13 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
             imagePickerLauncher.launch("image/*")
         }
 
+
         binding.submitButton.setOnClickListener {
             val itemTitle = binding.itemTitleInput.text.toString().trim()
             val description = binding.descriptionInput.text.toString().trim()
             val category = binding.categorySpinner.selectedItem?.toString()?.trim() ?: ""
             val foundAt = binding.foundAtInput.text.toString().trim()
+            val roomNumber = binding.roomNumberInput.text.toString().trim()
             val dateTimeFound = binding.dateTimeInput.text.toString().trim()
             val isAnonymous = binding.switchAnonymous.isChecked
 
@@ -184,6 +186,17 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
             }
 
             val dateTimeForSubmission = binding.dateTimeInput.tag as? String ?: binding.dateTimeInput.text.toString()
+            // Block image upload for sensitive categories
+            val restrictedCategories = listOf("WatCard")
+            if (restrictedCategories.contains(category) && selectedImageUri != null) {
+                Toast.makeText(
+                    requireContext(),
+                    "Images cannot be attached for $category due to privacy concerns.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
             viewModel.submitFoundItem(
                 FoundItem(
                     itemTitle = itemTitle,
@@ -191,6 +204,7 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
                     category = category,
                     foundAt = foundAt,
                     dateTimeFound = dateTimeForSubmission,
+                    roomNumber = roomNumber,
                     dateCreated = sdf.format(Date()),
                     isAnonymous = isAnonymous
                 ),
@@ -213,6 +227,28 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
             "Other",
             "WatCard"
         )
+
+        val categoryAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.categorySpinner.adapter = categoryAdapter
+
+        val restrictedCategories = listOf("WatCard")
+
+        binding.categorySpinner.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedCategory = parent.getItemAtPosition(position).toString()
+
+                if (restrictedCategories.contains(selectedCategory)) {
+                    binding.buttonSelectImage.isEnabled = false
+                    selectedImageUri = null
+                    binding.imagePreview.setImageResource(R.drawable.ic_launcher_foreground)
+                    Toast.makeText(requireContext(), "Image upload disabled for $selectedCategory due to security reasons.", Toast.LENGTH_SHORT).show()
+                } else {
+                    binding.buttonSelectImage.isEnabled = true
+                }
+            }
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>) {}
+        }
 
         val locations = listOf(
             "Select Location", //placeholder
@@ -253,10 +289,6 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
             "University Club (UC)",
             "Other"
         )
-
-        val categoryAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
-        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.categorySpinner.adapter = categoryAdapter
 
         val locationAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, locations)
         binding.foundAtInput.setAdapter(locationAdapter)
@@ -341,6 +373,7 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
         binding.dateTimeInput.text?.clear()
         binding.categorySpinner.setSelection(0)
         binding.foundAtInput.text?.clear()
+        binding.roomNumberInput.text?.clear()
         selectedImageUri = null
         binding.imagePreview.setImageResource(R.drawable.ic_launcher_foreground)
     }

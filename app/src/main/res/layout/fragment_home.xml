@@ -17,9 +17,9 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_refresh"
         android:contentDescription="Refresh feed"
-        android:tint="@color/purple_700"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="@color/purple_700" />
 
     <LinearLayout
         android:id="@+id/filterBar"
