@@ -10,55 +10,95 @@
     android:focusable="true"
     android:background="?android:attr/selectableItemBackground">
 
-    <!-- Post Image on the left -->
-    <ImageView
-        android:id="@+id/imagePost"
+    <!-- Post Image on the left with proper spacing -->
+    <FrameLayout
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@drawable/ic_image_upload"
-        android:scaleType="centerCrop"
-        android:background="@drawable/rounded_card_background"
-        android:contentDescription="Post image" />
+        android:layout_marginEnd="16dp">
 
-    <!-- Text content in the middle -->
+        <ImageView
+            android:id="@+id/imagePost"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_image_upload"
+            android:scaleType="centerCrop"
+            android:background="@drawable/rounded_card_background"
+            android:contentDescription="Post image" />
+
+        <!-- Fallback icon for when no image is available -->
+        <ImageView
+            android:id="@+id/imageFallback"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_image_placeholder"
+            android:visibility="gone"
+            android:contentDescription="No image available" />
+
+    </FrameLayout>
+
+    <!-- Text content in the middle with better spacing -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:gravity="center_vertical">
+        android:layout_gravity="center_vertical">
 
         <TextView
             android:id="@+id/textUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/black"
+            android:maxLines="1"
+            android:ellipsize="end"
             tools:text="Alice Johnson" />
 
         <TextView
             android:id="@+id/textPostTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="4dp"
             android:textColor="@color/darker_gray"
-            android:textSize="16sp"
-            android:textStyle="bold"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="end"
             tools:text="Lost Wallet at SLC" />
+
+        <!-- Status indicator for resolved/deleted posts -->
+        <TextView
+            android:id="@+id/textStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="11sp"
+            android:textStyle="italic"
+            android:visibility="gone"
+            tools:text="✓ Resolved"
+            tools:visibility="visible" />
 
     </LinearLayout>
 
-    <!-- Timestamp on the right -->
-    <TextView
-        android:id="@+id/textTimestamp"
+    <!-- Timestamp on the right with better alignment -->
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_gravity="center_vertical"
-        android:layout_marginStart="8dp"
-        android:textColor="@color/darker_gray"
-        android:textSize="14sp"
-        tools:text="2 hours ago" />
+        android:layout_marginStart="12dp">
+
+        <TextView
+            android:id="@+id/textTimestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/darker_gray"
+            android:textSize="12sp"
+            android:gravity="end"
+            tools:text="2 hours ago" />
+
+    </LinearLayout>
 
     <!-- Delete button (hidden by default) -->
     <ImageButton
