@@ -61,10 +61,6 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         val textDateTime: TextView = view.findViewById(R.id.textDateTime)
         val textPostedBy: TextView = view.findViewById(R.id.textPostedBy)
         val adminIndicator: TextView = view.findViewById(R.id.adminIndicator)
-        val buttonContact: Button = view.findViewById(R.id.buttonContact)
-        val buttonDelete: Button = view.findViewById(R.id.buttonDelete)
-        
-                // Ensure button is visible
         val buttonContact: LinearLayout = view.findViewById(R.id.buttonContact)
         val labelDateTime: TextView = view.findViewById(R.id.labelDateTime)
         val textDateTimeCreated: TextView = view.findViewById(R.id.textDateTimeCreated)
@@ -170,11 +166,14 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         }
 
         // Show delete button for admin users
+        val buttonDeletePost: Button = view.findViewById(R.id.buttonDeletePost)
         if (isAdmin) {
-            buttonDelete.visibility = View.VISIBLE
+            buttonDeletePost.visibility = View.VISIBLE
             android.util.Log.d("PostDetailsFragment", "Showing delete button for admin")
+            android.util.Log.d("PostDetailsFragment", "Admin delete button visibility set to VISIBLE")
         } else {
-            buttonDelete.visibility = View.GONE
+            buttonDeletePost.visibility = View.GONE
+            android.util.Log.d("PostDetailsFragment", "Admin delete button visibility set to GONE (not admin)")
         }
 
         // Check if this is the current user's post
@@ -200,11 +199,11 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             chatIcon?.visibility = android.view.View.VISIBLE
             // Set contact button text based on anonymity and admin status
             if (isAnonymous == true && isAdmin) {
-                buttonContact.text = "Contact $userName"
+                buttonContactText.text = "Contact $userName"
             } else if (isAnonymous == true) {
-                buttonContact.text = "Contact Anonymous"
+                buttonContactText.text = "Contact Anonymous"
             } else {
-                buttonContact.text = "Contact $userName"
+                buttonContactText.text = "Contact $userName"
             }
         }
         
@@ -330,7 +329,7 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         }
 
         // Set up delete button for admin users
-        buttonDelete.setOnClickListener {
+        buttonDeletePost.setOnClickListener {
             if (!isAdmin) {
                 return@setOnClickListener
             }
@@ -344,6 +343,15 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
+        }
+
+        // Set up resolve and delete button click listeners
+        buttonResolve.setOnClickListener {
+            handleResolvePost(postType, itemTitle, userId, dateTimeCreated)
+        }
+
+        buttonDelete.setOnClickListener {
+            handleDeletePost(postType, itemTitle, userId, dateTimeCreated)
         }
     }
 
@@ -393,15 +401,6 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 android.util.Log.e("PostDetailsFragment", "Failed to find post for deletion", exception)
                 android.widget.Toast.makeText(requireContext(), "Failed to access database: ${exception.message}", android.widget.Toast.LENGTH_SHORT).show()
             }
-
-        // Set up resolve and delete button click listeners
-        buttonResolve.setOnClickListener {
-            handleResolvePost(postType, itemTitle, userId, dateTimeCreated)
-        }
-
-        buttonDelete.setOnClickListener {
-            handleDeletePost(postType, itemTitle, userId, dateTimeCreated)
-        }
     }
 
     private fun formatDateTime(dateTimeString: String): String {

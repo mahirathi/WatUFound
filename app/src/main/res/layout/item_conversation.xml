@@ -17,6 +17,33 @@
         android:padding="16dp"
         android:gravity="center_vertical">
 
+        <!-- Post Image on the left with proper spacing -->
+        <FrameLayout
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="16dp">
+
+            <ImageView
+                android:id="@+id/imagePost"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_image_upload"
+                android:scaleType="centerCrop"
+                android:background="@drawable/rounded_card_background"
+                android:contentDescription="Post image" />
+
+            <!-- Fallback icon for when no image is available -->
+            <ImageView
+                android:id="@+id/imageFallback"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_image_placeholder"
+                android:visibility="gone"
+                android:contentDescription="No image available" />
+
+        </FrameLayout>
+
         <!-- User Avatar -->
         <ImageView
             android:layout_width="48dp"
@@ -60,6 +87,16 @@
                 android:textSize="12sp"
                 android:textColor="@color/gray"
                 android:alpha="0.7" />
+
+            <TextView
+                android:id="@+id/textStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="11sp"
+                android:textStyle="italic"
+                android:visibility="gone"
+                android:layout_marginTop="2dp" />
 
         </LinearLayout>
 

@@ -363,7 +363,7 @@
                     android:background="@drawable/admin_icon_background"
                     android:padding="6dp"
                     android:src="@drawable/ic_dashboard_black_24dp"
-                    android:tint="#FFFFFF" />
+                    app:tint="#FFFFFF" />
 
                 <!-- Text Content -->
                 <LinearLayout
@@ -396,7 +396,7 @@
                     android:layout_height="24dp"
                     android:layout_marginStart="8dp"
                     android:src="@drawable/ic_arrow_forward"
-                    android:tint="#FFFFFF" />
+                    app:tint="#FFFFFF" />
 
             </LinearLayout>
 
