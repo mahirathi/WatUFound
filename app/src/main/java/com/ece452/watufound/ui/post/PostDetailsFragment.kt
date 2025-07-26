@@ -50,7 +50,9 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         val tagCategory: TextView = view.findViewById(R.id.tagCategory)
         val textTitle: TextView = view.findViewById(R.id.textTitle)
         val textDescription: TextView = view.findViewById(R.id.textDescription)
-        val textLocation: TextView = view.findViewById(R.id.textLocation)
+        val textBuilding: TextView = view.findViewById(R.id.textBuilding)
+        val textRoom: TextView = view.findViewById(R.id.textRoom)
+        val labelRoom: TextView = view.findViewById(R.id.labelRoom)
         val textDateTime: TextView = view.findViewById(R.id.textDateTime)
         val textPostedBy: TextView = view.findViewById(R.id.textPostedBy)
         val buttonContact: Button = view.findViewById(R.id.buttonContact)
@@ -69,13 +71,13 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         val itemTitle = arguments?.getString("itemTitle", "")
         val description = arguments?.getString("description", "")
         val category = arguments?.getString("category", "")
-        val location = arguments?.getString("location", "")
+        val building = arguments?.getString("location", "")
         val dateTime = arguments?.getString("dateTime", "")
         val userId = arguments?.getString("userId", "")
         val userName = arguments?.getString("userName", "")
         val isAnonymous = arguments?.getBoolean("isAnonymous")
         val imageUrl = arguments?.getString("imageUrl")
-        
+        val roomNumber = arguments?.getString("roomNumber", "")
         // Load image if available
         if (!imageUrl.isNullOrBlank()) {
             imagePost.visibility = View.VISIBLE
@@ -86,6 +88,15 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 .into(imagePost)
         } else {
             imagePost.visibility = View.GONE
+        }
+
+        if(!roomNumber.isNullOrBlank()) {
+            textRoom.visibility = View.VISIBLE
+            labelRoom.visibility = View.VISIBLE
+            textRoom.text = roomNumber
+        } else {
+            textRoom.visibility = View.GONE
+            labelRoom.visibility = View.GONE
         }
         
         // Debug logging
@@ -130,8 +141,8 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         tagCategory.setTextColor(requireContext().getColor(R.color.category_text))
         textTitle.text = itemTitle
         textDescription.text = description
-        locationName = location
-        textLocation.text = location
+        locationName = building
+        textBuilding.text = building
         textDateTime.text = TimeUtils.getRelativeTimeAgo(dateTime ?: "")
         
         // Set up contact button

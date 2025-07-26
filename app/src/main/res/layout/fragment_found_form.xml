@@ -68,7 +68,16 @@
                 android:gravity="top"
                 android:inputType="textMultiLine"
                 android:minLines="3" />
-
+            <TextView
+                android:id="@+id/noticeMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/notice_background"
+                android:autoLink="web"
+                android:text="@string/notice_high_value_item_deposition"
+                android:textColor="@color/blue"
+                android:padding="12dp"
+                android:textSize="14sp"/>
             <!-- Category -->
             <TextView
                 style="@style/TextLabel"

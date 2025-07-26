@@ -132,22 +132,42 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Location"
+                android:text="@string/building_title"
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:textColor="@color/black"
                 android:layout_marginBottom="8dp" />
 
             <TextView
-                android:id="@+id/textLocation"
+                android:id="@+id/textBuilding"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Location details"
+                android:text="@string/building_details"
                 android:textSize="16sp"
                 android:textColor="#444444"
-                android:drawableLeft="@drawable/ic_map_pin"
                 android:drawablePadding="8dp"
-                android:layout_marginBottom="24dp" />
+                android:layout_marginBottom="24dp"
+                app:drawableLeftCompat="@drawable/ic_map_pin" />
+
+            <TextView
+                android:id="@+id/labelRoom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/room_title"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/textRoom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/room_details"
+                android:textSize="16sp"
+                android:textColor="#444444"
+                android:drawablePadding="8dp"
+                android:layout_marginBottom="24dp"/>
 
             <!-- Map Preview -->
             <com.google.android.gms.maps.MapView

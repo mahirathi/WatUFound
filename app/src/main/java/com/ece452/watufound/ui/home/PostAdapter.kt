@@ -36,7 +36,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
         private val tagCategory: TextView = itemView.findViewById(R.id.tagCategory)
         private val textTitle: TextView = itemView.findViewById(R.id.textTitle)
         private val textDescription: TextView = itemView.findViewById(R.id.textDescription)
-        private val textLocation: TextView = itemView.findViewById(R.id.textLocation)
+        private val textLocation: TextView = itemView.findViewById(R.id.textBuilding)
         private val textTime: TextView = itemView.findViewById(R.id.textTime)
         private val buttonArrow: ImageButton = itemView.findViewById(R.id.buttonArrow)
 
@@ -59,6 +59,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                     putString("userName", item.item.userName)
                     putBoolean("isAnonymous", item.item.isAnonymous)
                     putString("imageUrl", item.item.imageUrl)
+                    putString("roomNumber", item.item.roomNumber)
                 }
                 is FeedItem.Found -> Bundle().apply {
                     putString("postType", "found")
@@ -71,6 +72,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                     putString("userName", item.item.userName)
                     putBoolean("isAnonymous", item.item.isAnonymous)
                     putString("imageUrl", item.item.imageUrl)
+                    putString("roomNumber", item.item.roomNumber)
                 }
             }
             

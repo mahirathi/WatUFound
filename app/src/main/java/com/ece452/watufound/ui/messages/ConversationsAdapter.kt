@@ -8,14 +8,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ece452.watufound.R
-
-// New data class for conversation list items
-data class ConversationListItem(
-    val conversationId: String,
-    val posterName: String,
-    val postTitle: String
-)
-
 class ConversationsAdapter(
     private val onConversationClick: (ConversationListItem) -> Unit,
     private val onDeleteClick: ((ConversationListItem) -> Unit)? = null,
