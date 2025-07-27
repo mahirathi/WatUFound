@@ -212,7 +212,7 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
                 selectedImageUri,
                 onBanned = {
                     // Handle banned user
-                    Toast.makeText(requireContext(), "You are banned from posting. Please contact an administrator.", Toast.LENGTH_LONG).show()
+//                    Toast.makeText(requireContext(), "You are banned from posting. Please contact an administrator.", Toast.LENGTH_LONG).show()
                 }
             )
 
@@ -407,11 +407,11 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
         // Disable submit button and change its appearance
         binding.submitButton.isEnabled = false
         binding.submitButton.setBackgroundColor(requireContext().getColor(android.R.color.darker_gray))
-        binding.submitButton.text = "POSTING DISABLED - PLEASEE CONTACT ADMINISTRATOR"
+        binding.submitButton.text = "POSTING DISABLED - PLEASE CONTACT ADMINISTRATOR"
 
         // Show ban message
-        val banMessage = "You are banned from posting. Please contact an administrator for assistance."
-        android.widget.Toast.makeText(requireContext(), banMessage, android.widget.Toast.LENGTH_LONG).show()
+//        val banMessage = "You are banned from posting. Please contact an administrator for assistance."
+//        android.widget.Toast.makeText(requireContext(), banMessage, android.widget.Toast.LENGTH_LONG).show()
     }
 
     private fun clearForm() {

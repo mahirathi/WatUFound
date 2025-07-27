@@ -387,7 +387,6 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 documentToDelete.reference.delete()
                     .addOnSuccessListener {
                         android.util.Log.d("PostDetailsFragment", "Post deleted successfully")
-                        android.widget.Toast.makeText(requireContext(), "Post deleted successfully", android.widget.Toast.LENGTH_SHORT).show()
                         // Navigate back to feed
                         findNavController().navigateUp()
                     }

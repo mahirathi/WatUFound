@@ -303,7 +303,7 @@ class AdminUsersFragment : Fragment() {
         
         userRef.update(banData)
             .addOnSuccessListener {
-                Toast.makeText(requireContext(), "User banned successfully", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(requireContext(), "User banned successfully", Toast.LENGTH_SHORT).show()
                 onComplete()
             }
             .addOnFailureListener { exception ->
@@ -339,7 +339,7 @@ class AdminUsersFragment : Fragment() {
         
         userRef.update(unbanData)
             .addOnSuccessListener {
-                Toast.makeText(requireContext(), "User unbanned successfully", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(requireContext(), "User unbanned successfully", Toast.LENGTH_SHORT).show()
                 onComplete()
             }
             .addOnFailureListener { exception ->
