@@ -34,6 +34,9 @@ class ConversationsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        android.util.Log.d("ConversationsFragment", "=== CONVERSATIONS FRAGMENT CREATED ===")
+        android.util.Log.d("ConversationsFragment", "Fragment arguments: $arguments")
 
         conversationsAdapter = ConversationsAdapter(
             onConversationClick = { conversation ->
@@ -57,14 +60,18 @@ class ConversationsFragment : Fragment() {
         binding.recyclerViewRecent.layoutManager = LinearLayoutManager(context)
         binding.recyclerViewRecent.adapter = conversationsAdapter
 
+        android.util.Log.d("ConversationsFragment", "Setting up conversation list view")
+        
         // Fetch conversations from database
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
+            android.util.Log.d("ConversationsFragment", "User authenticated, fetching conversations")
             val db = FirebaseDatabase.getInstance().reference
             conversationsListener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (_binding == null) return // Prevent crash if view is destroyed
                     val conversations = mutableListOf<ConversationListItem>()
+                    val pendingStatusFetches = mutableListOf<() -> Unit>()
                     
                     for (child in snapshot.children) {
                         val conversationId = child.child("conversationId").getValue(String::class.java) ?: continue
@@ -101,19 +108,6 @@ class ConversationsFragment : Fragment() {
                             postImageUrl
                         }
                         
-                        // Get timestamp from the conversation messages
-                        getConversationTimestamp(conversationId) { realTimestamp ->
-                            // Update the conversation item with the real timestamp
-                            val updatedConversations = conversations.toMutableList()
-                            val index = updatedConversations.indexOfFirst { it.conversationId == conversationId }
-                            if (index != -1) {
-                                updatedConversations[index] = updatedConversations[index].copy(timestamp = realTimestamp)
-                                // Sort by timestamp (most recent first), handling null values
-                                updatedConversations.sortByDescending { it.timestamp ?: "" }
-                                conversationsAdapter.submitList(updatedConversations)
-                            }
-                        }
-                        
                         // Get creation timestamp as fallback
                         val createdAt = child.child("createdAt").getValue(Long::class.java)
                         val fallbackTimestamp = if (createdAt != null) {
@@ -122,19 +116,53 @@ class ConversationsFragment : Fragment() {
                             ""
                         }
                         
-                        conversations.add(ConversationListItem(
+                        // Create conversation item with initial status (will be updated later)
+                        val conversationItem = ConversationListItem(
                             conversationId = conversationId,
                             posterName = posterName,
                             postTitle = postTitle,
                             postImageUrl = finalImageUrl,
-                            timestamp = fallbackTimestamp, // Use creation timestamp as fallback
-                            postId = postId
-                        ))
+                            timestamp = fallbackTimestamp,
+                            postId = postId,
+                            isResolved = false,
+                            isDeleted = false
+                        )
+                        
+                        conversations.add(conversationItem)
+                        
+                        // Add status fetch to pending list
+                        if (!postId.isNullOrBlank()) {
+                            pendingStatusFetches.add {
+                                android.util.Log.d("ConversationsFragment", "Fetching status for postId: $postId, postTitle: $postTitle")
+                                fetchPostStatus(postId) { isResolved, isDeleted ->
+                                    android.util.Log.d("ConversationsFragment", "Status fetched for postId: $postId - Resolved: $isResolved, Deleted: $isDeleted")
+                                    // Update the conversation item with status
+                                    val updatedConversations = conversations.toMutableList()
+                                    val index = updatedConversations.indexOfFirst { it.postId == postId }
+                                    if (index != -1) {
+                                        updatedConversations[index] = updatedConversations[index].copy(
+                                            isResolved = isResolved,
+                                            isDeleted = isDeleted
+                                        )
+                                        android.util.Log.d("ConversationsFragment", "Updated conversation item with status - Resolved: $isResolved, Deleted: $isDeleted")
+                                        conversationsAdapter.submitList(updatedConversations)
+                                    } else {
+                                        android.util.Log.e("ConversationsFragment", "Could not find conversation with postId: $postId")
+                                    }
+                                }
+                            }
+                        } else {
+                            android.util.Log.d("ConversationsFragment", "No postId available for conversation: $postTitle")
+                        }
                     }
                     
-                    // Sort conversations by timestamp (most recent first), handling null values
+                    // Submit initial list to adapter
                     conversations.sortByDescending { it.timestamp ?: "" }
                     conversationsAdapter.submitList(conversations)
+                    
+                    // Execute all pending status fetches
+                    pendingStatusFetches.forEach { it() }
+                    
                     binding.textNoResults.visibility = if (conversations.isEmpty()) View.VISIBLE else View.GONE
                 }
                 override fun onCancelled(error: DatabaseError) {}
@@ -242,6 +270,52 @@ class ConversationsFragment : Fragment() {
             .addOnFailureListener { exception ->
                 android.util.Log.e("ConversationsFragment", "Error fetching from lost_items", exception)
                 onImageUrlFetched(null)
+            }
+    }
+    
+    private fun fetchPostStatus(postId: String, onStatusFetched: (Boolean, Boolean) -> Unit) {
+        android.util.Log.d("ConversationsFragment", "=== FETCHING POST STATUS ===")
+        android.util.Log.d("ConversationsFragment", "postId: '$postId'")
+        
+        val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        
+        // Try to find the post in both collections
+        android.util.Log.d("ConversationsFragment", "Checking lost_items collection...")
+        firestore.collection("lost_items").document(postId).get()
+            .addOnSuccessListener { document ->
+                android.util.Log.d("ConversationsFragment", "Lost items query completed")
+                android.util.Log.d("ConversationsFragment", "Document exists: ${document.exists()}")
+                if (document.exists()) {
+                    val isResolved = document.getBoolean("isResolved") ?: false
+                    val isDeleted = document.getBoolean("isDeleted") ?: false
+                    android.util.Log.d("ConversationsFragment", "Found post in lost_items - Resolved: $isResolved, Deleted: $isDeleted")
+                    onStatusFetched(isResolved, isDeleted)
+                } else {
+                    // Try found_items
+                    android.util.Log.d("ConversationsFragment", "Post not found in lost_items, checking found_items...")
+                    firestore.collection("found_items").document(postId).get()
+                        .addOnSuccessListener { foundDocument ->
+                            android.util.Log.d("ConversationsFragment", "Found items query completed")
+                            android.util.Log.d("ConversationsFragment", "Document exists: ${foundDocument.exists()}")
+                            if (foundDocument.exists()) {
+                                val isResolved = foundDocument.getBoolean("isResolved") ?: false
+                                val isDeleted = foundDocument.getBoolean("isDeleted") ?: false
+                                android.util.Log.d("ConversationsFragment", "Found post in found_items - Resolved: $isResolved, Deleted: $isDeleted")
+                                onStatusFetched(isResolved, isDeleted)
+                            } else {
+                                android.util.Log.d("ConversationsFragment", "Post not found in either collection")
+                                onStatusFetched(false, false)
+                            }
+                        }
+                        .addOnFailureListener { exception ->
+                            android.util.Log.e("ConversationsFragment", "Error fetching from found_items", exception)
+                            onStatusFetched(false, false)
+                        }
+                }
+            }
+            .addOnFailureListener { exception ->
+                android.util.Log.e("ConversationsFragment", "Error fetching from lost_items", exception)
+                onStatusFetched(false, false)
             }
     }
 } 

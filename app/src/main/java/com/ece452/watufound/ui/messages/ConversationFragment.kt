@@ -225,6 +225,14 @@ class ConversationFragment : Fragment() {
                 binding.postPreviewImage.setImageResource(R.drawable.rounded_image_background)
             }
             
+            // Fetch and display post status
+            if (postId.isNotEmpty()) {
+                fetchPostStatusForPreview(postId)
+            } else {
+                // Try to fetch by title if no postId available
+                fetchPostStatusByTitle(postTitle)
+            }
+            
             // Setup click listener to navigate to post details
             binding.postPreviewLayout.setOnClickListener {
                 Log.d("ConversationFragment", "=== POST PREVIEW CLICKED ===")
@@ -276,10 +284,12 @@ class ConversationFragment : Fragment() {
                         putString("description", document.getString("description") ?: "")
                         putString("category", document.getString("category") ?: "")
                         putString("location", document.getString("lastSeenAt") ?: "")
-                        putString("dateTime", document.getString("dateCreated") ?: "")
+                        putString("dateTime", document.getString("dateTimeLost") ?: "") // Use dateTimeLost for lost items
+                        putString("dateTimeCreated", document.getString("dateCreated") ?: "")
                         putString("userId", document.getString("userId") ?: "")
                         putString("userName", document.getString("userName") ?: "")
                         putBoolean("isAnonymous", document.getBoolean("isAnonymous") ?: false)
+                        putString("roomNumber", document.getString("roomNumber") ?: "") // Add roomNumber
                     }
                     Log.d("ConversationFragment", "Fallback: Created bundle for lost item, navigating...")
                     findNavController().navigate(R.id.navigation_post_details, bundle)
@@ -301,10 +311,12 @@ class ConversationFragment : Fragment() {
                                     putString("description", document.getString("description") ?: "")
                                     putString("category", document.getString("category") ?: "")
                                     putString("location", document.getString("foundAt") ?: "")
-                                    putString("dateTime", document.getString("dateCreated") ?: "")
+                                    putString("dateTime", document.getString("dateTimeFound") ?: "") // Use dateTimeFound for found items
+                                    putString("dateTimeCreated", document.getString("dateCreated") ?: "")
                                     putString("userId", document.getString("userId") ?: "")
                                     putString("userName", document.getString("userName") ?: "")
                                     putBoolean("isAnonymous", document.getBoolean("isAnonymous") ?: false)
+                                    putString("roomNumber", document.getString("roomNumber") ?: "") // Add roomNumber
                                 }
                                 Log.d("ConversationFragment", "Fallback: Created bundle for found item, navigating...")
                                 findNavController().navigate(R.id.navigation_post_details, bundle)
@@ -320,9 +332,11 @@ class ConversationFragment : Fragment() {
                                     putString("category", "")
                                     putString("location", "")
                                     putString("dateTime", "")
+                                    putString("dateTimeCreated", "")
                                     putString("userId", "")
                                     putString("userName", "")
                                     putBoolean("isAnonymous", false)
+                                    putString("roomNumber", "")
                                 }
                                 Log.d("ConversationFragment", "Fallback: Using minimal bundle, navigating...")
                                 findNavController().navigate(R.id.navigation_post_details, bundle)
@@ -340,9 +354,11 @@ class ConversationFragment : Fragment() {
                                 putString("category", "")
                                 putString("location", "")
                                 putString("dateTime", "")
+                                putString("dateTimeCreated", "")
                                 putString("userId", "")
                                 putString("userName", "")
                                 putBoolean("isAnonymous", false)
+                                putString("roomNumber", "")
                             }
                             findNavController().navigate(R.id.navigation_post_details, bundle)
                         }
@@ -360,9 +376,11 @@ class ConversationFragment : Fragment() {
                     putString("category", "")
                     putString("location", "")
                     putString("dateTime", "")
+                    putString("dateTimeCreated", "")
                     putString("userId", "")
                     putString("userName", "")
                     putBoolean("isAnonymous", false)
+                    putString("roomNumber", "")
                 }
                 findNavController().navigate(R.id.navigation_post_details, bundle)
             }
@@ -379,12 +397,11 @@ class ConversationFragment : Fragment() {
         
         val firestore = FirebaseFirestore.getInstance()
         
-        // Try to find the post by document ID in both collections
+        // First try lost_items collection
         firestore.collection("lost_items")
             .document(postId)
             .get()
             .addOnSuccessListener { document ->
-                Log.d("ConversationFragment", "Firestore query completed for lost_items, document exists: ${document.exists()}")
                 if (document.exists()) {
                     Log.d("ConversationFragment", "Post found in lost_items, navigating...")
                     val bundle = Bundle().apply {
@@ -395,21 +412,20 @@ class ConversationFragment : Fragment() {
                         putString("description", document.getString("description") ?: "")
                         putString("category", document.getString("category") ?: "")
                         putString("location", document.getString("lastSeenAt") ?: "")
-                        putString("dateTime", document.getString("dateCreated") ?: "")
+                        putString("dateTime", document.getString("dateTimeLost") ?: "") // Use dateTimeLost for lost items
+                        putString("dateTimeCreated", document.getString("dateCreated") ?: "")
                         putString("userId", document.getString("userId") ?: "")
                         putString("userName", document.getString("userName") ?: "")
                         putBoolean("isAnonymous", document.getBoolean("isAnonymous") ?: false)
+                        putString("roomNumber", document.getString("roomNumber") ?: "") // Add roomNumber
                     }
-                    Log.d("ConversationFragment", "Created bundle for lost item, navigating...")
                     findNavController().navigate(R.id.navigation_post_details, bundle)
                 } else {
-                    Log.d("ConversationFragment", "Post not found in lost_items, trying found_items...")
                     // Try found_items collection
                     firestore.collection("found_items")
                         .document(postId)
                         .get()
                         .addOnSuccessListener { foundDocument ->
-                            Log.d("ConversationFragment", "Firestore query completed for found_items, document exists: ${foundDocument.exists()}")
                             if (foundDocument.exists()) {
                                 Log.d("ConversationFragment", "Post found in found_items, navigating...")
                                 val bundle = Bundle().apply {
@@ -420,16 +436,16 @@ class ConversationFragment : Fragment() {
                                     putString("description", foundDocument.getString("description") ?: "")
                                     putString("category", foundDocument.getString("category") ?: "")
                                     putString("location", foundDocument.getString("foundAt") ?: "")
-                                    putString("dateTime", foundDocument.getString("dateCreated") ?: "")
+                                    putString("dateTime", foundDocument.getString("dateTimeFound") ?: "") // Use dateTimeFound for found items
+                                    putString("dateTimeCreated", foundDocument.getString("dateCreated") ?: "")
                                     putString("userId", foundDocument.getString("userId") ?: "")
                                     putString("userName", foundDocument.getString("userName") ?: "")
                                     putBoolean("isAnonymous", foundDocument.getBoolean("isAnonymous") ?: false)
+                                    putString("roomNumber", foundDocument.getString("roomNumber") ?: "") // Add roomNumber
                                 }
-                                Log.d("ConversationFragment", "Created bundle for found item, navigating...")
                                 findNavController().navigate(R.id.navigation_post_details, bundle)
                             } else {
                                 Log.w("ConversationFragment", "Post not found in either collection by ID: $postId")
-                                // Fallback: navigate with available data
                                 navigateWithFallback(postTitle, postImageUrl)
                             }
                         }
@@ -443,6 +459,113 @@ class ConversationFragment : Fragment() {
                 Log.e("ConversationFragment", "Error fetching from lost_items", exception)
                 navigateWithFallback(postTitle, postImageUrl)
             }
+    }
+    
+    private fun fetchPostStatusForPreview(postId: String) {
+        Log.d("ConversationFragment", "Fetching post status for preview - postId: $postId")
+        
+        val firestore = FirebaseFirestore.getInstance()
+        
+        // Try to find the post in both collections
+        firestore.collection("lost_items").document(postId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val isResolved = document.getBoolean("isResolved") ?: false
+                    val isDeleted = document.getBoolean("isDeleted") ?: false
+                    Log.d("ConversationFragment", "Found post in lost_items - Resolved: $isResolved, Deleted: $isDeleted")
+                    displayPostStatus(isResolved, isDeleted)
+                } else {
+                    // Try found_items
+                    firestore.collection("found_items").document(postId).get()
+                        .addOnSuccessListener { foundDocument ->
+                            if (foundDocument.exists()) {
+                                val isResolved = foundDocument.getBoolean("isResolved") ?: false
+                                val isDeleted = foundDocument.getBoolean("isDeleted") ?: false
+                                Log.d("ConversationFragment", "Found post in found_items - Resolved: $isResolved, Deleted: $isDeleted")
+                                displayPostStatus(isResolved, isDeleted)
+                            } else {
+                                Log.d("ConversationFragment", "Post not found in either collection")
+                                displayPostStatus(false, false)
+                            }
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e("ConversationFragment", "Error fetching from found_items", exception)
+                            displayPostStatus(false, false)
+                        }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("ConversationFragment", "Error fetching from lost_items", exception)
+                displayPostStatus(false, false)
+            }
+    }
+    
+    private fun fetchPostStatusByTitle(postTitle: String) {
+        Log.d("ConversationFragment", "Fetching post status by title - postTitle: $postTitle")
+        
+        val firestore = FirebaseFirestore.getInstance()
+        
+        // First try lost_items collection
+        firestore.collection("lost_items")
+            .whereEqualTo("itemTitle", postTitle)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (!documents.isEmpty) {
+                    val document = documents.documents[0]
+                    val isResolved = document.getBoolean("isResolved") ?: false
+                    val isDeleted = document.getBoolean("isDeleted") ?: false
+                    Log.d("ConversationFragment", "Found post in lost_items by title - Resolved: $isResolved, Deleted: $isDeleted")
+                    displayPostStatus(isResolved, isDeleted)
+                } else {
+                    // Try found_items collection
+                    firestore.collection("found_items")
+                        .whereEqualTo("itemTitle", postTitle)
+                        .get()
+                        .addOnSuccessListener { foundDocuments ->
+                            if (!foundDocuments.isEmpty) {
+                                val document = foundDocuments.documents[0]
+                                val isResolved = document.getBoolean("isResolved") ?: false
+                                val isDeleted = document.getBoolean("isDeleted") ?: false
+                                Log.d("ConversationFragment", "Found post in found_items by title - Resolved: $isResolved, Deleted: $isDeleted")
+                                displayPostStatus(isResolved, isDeleted)
+                            } else {
+                                Log.d("ConversationFragment", "Post not found in either collection by title")
+                                displayPostStatus(false, false)
+                            }
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e("ConversationFragment", "Error fetching from found_items by title", exception)
+                            displayPostStatus(false, false)
+                        }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("ConversationFragment", "Error fetching from lost_items by title", exception)
+                displayPostStatus(false, false)
+            }
+    }
+    
+    private fun displayPostStatus(isResolved: Boolean, isDeleted: Boolean) {
+        Log.d("ConversationFragment", "Displaying post status - Resolved: $isResolved, Deleted: $isDeleted")
+        
+        when {
+            isDeleted -> {
+                binding.postPreviewStatus.visibility = View.VISIBLE
+                binding.postPreviewStatus.text = "🗑️ Deleted"
+                binding.postPreviewStatus.setTextColor(requireContext().getColor(R.color.status_deleted))
+                Log.d("ConversationFragment", "Showing DELETED status in preview")
+            }
+            isResolved -> {
+                binding.postPreviewStatus.visibility = View.VISIBLE
+                binding.postPreviewStatus.text = "✓ Resolved"
+                binding.postPreviewStatus.setTextColor(requireContext().getColor(R.color.status_resolved))
+                Log.d("ConversationFragment", "Showing RESOLVED status in preview")
+            }
+            else -> {
+                binding.postPreviewStatus.visibility = View.GONE
+                Log.d("ConversationFragment", "No status to show in preview")
+            }
+        }
     }
 
     override fun onDestroyView() {

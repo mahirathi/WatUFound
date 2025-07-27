@@ -1,75 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="16dp"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
     android:clickable="true"
     android:focusable="true"
     android:background="?android:attr/selectableItemBackground">
 
-    <!-- Post Image on the left -->
-    <ImageView
-        android:id="@+id/imagePost"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:src="@drawable/ic_image_upload"
-        android:scaleType="centerCrop"
-        android:background="@drawable/rounded_card_background"
-        android:contentDescription="Post image" />
-
-    <!-- Text content in the middle -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        android:padding="16dp"
         android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/textUserName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            tools:text="Alice Johnson" />
+        <!-- User Avatar -->
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/profile_picture_background"
+            android:src="@drawable/ic_person_black_24dp"
+            android:padding="16dp"
+            app:tint="@color/white" />
 
-        <TextView
-            android:id="@+id/textPostTitle"
+        <!-- Text content in the middle with better spacing -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/textUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="Alice Johnson" />
+
+            <TextView
+                android:id="@+id/userEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="user@example.com"
+                android:textSize="14sp"
+                android:textColor="@color/gray"
+                android:layout_marginBottom="4dp" />
+
+            <!-- Status Labels Container -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/userStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Active"
+                    android:textSize="12sp"
+                    android:textColor="@color/green"
+                    android:background="@drawable/tag_category_bg"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp" />
+
+                <TextView
+                    android:id="@+id/yourProfileLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Your Profile"
+                    android:textSize="12sp"
+                    android:textColor="@color/gray"
+                    android:background="@drawable/tag_category_bg"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Timestamp on the right with better alignment -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textColor="@color/darker_gray"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            tools:text="Lost Wallet at SLC" />
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/textTimestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/darker_gray"
+                android:textSize="12sp"
+                android:gravity="end"
+                tools:text="2 hours ago" />
+
+        </LinearLayout>
+
+        <!-- Delete button (hidden by default) -->
+        <ImageButton
+            android:id="@+id/buttonDelete"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Delete conversation"
+            android:src="@drawable/ic_delete"
+            android:visibility="gone" />
+
+        <!-- Ban Status Indicator -->
+        <ImageView
+            android:id="@+id/banStatusIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_lock"
+            android:visibility="gone"
+            android:layout_marginStart="8dp" />
 
     </LinearLayout>
 
-    <!-- Timestamp on the right -->
-    <TextView
-        android:id="@+id/textTimestamp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="8dp"
-        android:textColor="@color/darker_gray"
-        android:textSize="14sp"
-        tools:text="2 hours ago" />
-
-    <!-- Delete button (hidden by default) -->
-    <ImageButton
-        android:id="@+id/buttonDelete"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="8dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Delete conversation"
-        android:src="@drawable/ic_delete"
-        android:visibility="gone" />
-
-</LinearLayout> 
+</androidx.cardview.widget.CardView>

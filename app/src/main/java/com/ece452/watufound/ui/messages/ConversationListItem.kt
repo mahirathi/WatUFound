@@ -7,5 +7,7 @@ data class ConversationListItem(
     val postTitle: String,
     val postImageUrl: String? = null,
     val timestamp: String? = null,
-    val postId: String? = null
+    val postId: String? = null,
+    val isResolved: Boolean = false,
+    val isDeleted: Boolean = false
 )

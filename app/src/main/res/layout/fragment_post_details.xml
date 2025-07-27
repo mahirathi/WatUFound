@@ -112,14 +112,33 @@
                 android:layout_marginBottom="16dp" />
 
             <!-- Posted By section -->
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Posted By"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                android:layout_marginBottom="4dp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Posted By"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/adminIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="(Admin View)"
+                    android:textSize="12sp"
+                    android:textColor="@color/orange"
+                    android:textStyle="italic"
+                    android:visibility="gone" />
+
+            </LinearLayout>
             <TextView
                 android:id="@+id/textPostedBy"
                 android:layout_width="match_parent"
@@ -307,6 +326,18 @@
                     android:padding="12dp" />
 
             </LinearLayout>
+
+            <Button
+                android:id="@+id/buttonDeletePost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Delete Post"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/red"
+                android:padding="16dp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone" />
 
         </LinearLayout>
     </ScrollView>

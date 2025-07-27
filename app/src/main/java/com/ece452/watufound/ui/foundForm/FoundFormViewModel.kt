@@ -14,39 +14,61 @@ class FoundFormViewModel : ViewModel() {
     private val db = Firebase.firestore
     private val storage = FirebaseStorage.getInstance()
 
-    fun submitFoundItem(item: FoundItem, imageUri: Uri? = null) {
+    fun submitFoundItem(item: FoundItem, imageUri: Uri? = null, onBanned: () -> Unit = {}) {
         val currentUser = FirebaseAuth.getInstance().currentUser
-        val post = hashMapOf(
-            "itemTitle" to item.itemTitle,
-            "description" to item.description,
-            "category" to item.category,
-            "foundAt" to item.foundAt,
-            "roomNumber" to item.roomNumber,
-            "dateTimeFound" to item.dateTimeFound,
-            "dateCreated" to item.dateCreated,
-            "isAnonymous" to item.isAnonymous,
-            "userId" to (currentUser?.uid ?: ""),
-            "userName" to (currentUser?.displayName ?: currentUser?.email ?: "Unknown")
-        )
-
-        if (imageUri != null) {
-            // Upload image to Firebase Storage
-            val imageRef = storage.reference.child("gs://ece452-watufound.firebasestorage.app")
-            imageRef.putFile(imageUri)
-                .addOnSuccessListener { taskSnapshot ->
-                    imageRef.downloadUrl.addOnSuccessListener { uri ->
-                        post["imageUrl"] = uri.toString()
-                        saveFoundItem(post)
+        if (currentUser == null) {
+            Log.e("FoundFormVM", "No authenticated user")
+            return
+        }
+        
+        // Check if user is banned before allowing post
+        db.collection("users").document(currentUser.uid).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val isBanned = document.getBoolean("isBanned") ?: false
+                    if (isBanned) {
+                        Log.w("FoundFormVM", "User is banned from posting")
+                        onBanned()
+                        return@addOnSuccessListener
                     }
                 }
-                .addOnFailureListener { e ->
-                    Log.w("FoundFormVM", "Image upload failed", e)
-                    // Save post without image if upload fails
+                
+                // User is not banned, proceed with posting
+                val post = hashMapOf(
+                    "itemTitle" to item.itemTitle,
+                    "description" to item.description,
+                    "category" to item.category,
+                    "foundAt" to item.foundAt,
+                    "roomNumber" to item.roomNumber,
+                    "dateTimeFound" to item.dateTimeFound,
+                    "dateCreated" to item.dateCreated,
+                    "isAnonymous" to item.isAnonymous,
+                    "userId" to (currentUser.uid),
+                    "userName" to (currentUser.displayName ?: currentUser.email ?: "Unknown")
+                )
+
+                if (imageUri != null) {
+                    // Upload image to Firebase Storage
+                    val imageRef = storage.reference.child("gs://ece452-watufound.firebasestorage.app")
+                    imageRef.putFile(imageUri)
+                        .addOnSuccessListener { taskSnapshot ->
+                            imageRef.downloadUrl.addOnSuccessListener { uri ->
+                                post["imageUrl"] = uri.toString()
+                                saveFoundItem(post)
+                            }
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w("FoundFormVM", "Image upload failed", e)
+                            // Save post without image if upload fails
+                            saveFoundItem(post)
+                        }
+                } else {
                     saveFoundItem(post)
                 }
-        } else {
-            saveFoundItem(post)
-        }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("FoundFormVM", "Failed to check user ban status", exception)
+            }
     }
 
     private fun saveFoundItem(post: Any) {
