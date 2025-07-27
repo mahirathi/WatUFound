@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ece452.watufound.models.FoundItem
 import com.ece452.watufound.models.LostItem
+import com.ece452.watufound.utils.CategoryUtils
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import java.text.SimpleDateFormat
@@ -20,6 +21,7 @@ class HomeViewModel : ViewModel() {
 
     enum class Filter { ALL, LOST, FOUND }
     private var currentFilter = Filter.ALL
+    private var filterData = FilterData()
 
     init {
         fetchPosts()
@@ -30,16 +32,125 @@ class HomeViewModel : ViewModel() {
         filterPosts()
     }
 
+    fun setSearchQuery(query: String) {
+        filterData = filterData.copy(searchQuery = query.lowercase().trim())
+        filterPosts()
+    }
+
+    fun setSelectedCategories(categories: Set<String>) {
+        filterData = filterData.copy(selectedCategories = categories)
+        filterPosts()
+    }
+
+    fun setDateTimeRange(startDateTime: Date?, endDateTime: Date?) {
+        filterData = filterData.copy(startDateTime = startDateTime, endDateTime = endDateTime)
+        filterPosts()
+    }
+
+    fun getFilterData(): FilterData = filterData
+
+    fun clearAllFilters() {
+        filterData = FilterData()
+        filterPosts()
+    }
+
     fun refreshPosts() {
         fetchPosts()
     }
 
     private fun filterPosts() {
         val posts = _allPosts.value ?: emptyList()
-        _filteredPosts.value = when (currentFilter) {
+        
+        var filtered = when (currentFilter) {
             Filter.ALL -> posts
             Filter.LOST -> posts.filterIsInstance<FeedItem.Lost>()
             Filter.FOUND -> posts.filterIsInstance<FeedItem.Found>()
+        }
+
+        // Apply search filter (title, description, location)
+        if (filterData.searchQuery.isNotEmpty()) {
+            filtered = filtered.filter { post ->
+                val title = when (post) {
+                    is FeedItem.Lost -> post.item.itemTitle.lowercase()
+                    is FeedItem.Found -> post.item.itemTitle.lowercase()
+                }
+                val description = when (post) {
+                    is FeedItem.Lost -> post.item.description.lowercase()
+                    is FeedItem.Found -> post.item.description.lowercase()
+                }
+                val location = when (post) {
+                    is FeedItem.Lost -> post.item.lastSeenAt.lowercase()
+                    is FeedItem.Found -> post.item.foundAt.lowercase()
+                }
+                title.contains(filterData.searchQuery) || 
+                description.contains(filterData.searchQuery) || 
+                location.contains(filterData.searchQuery)
+            }
+        }
+
+        // Apply category filter
+        if (filterData.selectedCategories.isNotEmpty()) {
+            filtered = filtered.filter { post ->
+                val category = when (post) {
+                    is FeedItem.Lost -> post.item.category
+                    is FeedItem.Found -> post.item.category
+                }
+                filterData.selectedCategories.contains(category)
+            }
+        }
+
+        // Apply date/time range filter
+        if (filterData.startDateTime != null || filterData.endDateTime != null) {
+            filtered = filtered.filter { post ->
+                val dateString = when (post) {
+                    is FeedItem.Lost -> post.item.dateCreated
+                    is FeedItem.Found -> post.item.dateCreated
+                }
+                
+                try {
+                    val postDate = parseDateString(dateString)
+                    if (postDate == null) return@filter false
+                    
+                    val afterStart = filterData.startDateTime == null || 
+                                   postDate.after(filterData.startDateTime) || 
+                                   postDate.equals(filterData.startDateTime)
+                    val beforeEnd = filterData.endDateTime == null || 
+                                  postDate.before(filterData.endDateTime) || 
+                                  postDate.equals(filterData.endDateTime)
+                    
+                    afterStart && beforeEnd
+                } catch (e: Exception) {
+                    android.util.Log.e("HomeViewModel", "Error parsing date for filtering: $dateString", e)
+                    false
+                }
+            }
+        }
+
+        _filteredPosts.value = filtered
+    }
+
+    private fun parseDateString(dateString: String): Date? {
+        return try {
+            when {
+                dateString.matches(Regex("\\d{4}-\\d{2}-\\d{2}, \\d{2}:\\d{2}")) -> {
+                    // Format: "2025-07-23, 14:30"
+                    val dateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm", Locale.getDefault())
+                    dateFormat.parse(dateString)
+                }
+                dateString.matches(Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}")) -> {
+                    // Format: "2025-07-23 14:30"
+                    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                    dateFormat.parse(dateString)
+                }
+                else -> {
+                    // Try default format as fallback
+                    val dateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm", Locale.getDefault())
+                    dateFormat.parse(dateString)
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("HomeViewModel", "Error parsing date: $dateString", e)
+            null
         }
     }
 
