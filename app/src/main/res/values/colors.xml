@@ -33,7 +33,13 @@
     <!-- Category colors -->
     <color name="category_text">#4b5563</color>
     <color name="category_background">#f3f4f6</color>
-    
+
+    <!-- Admin colors -->
+    <color name="gray">#6B7280</color>
+    <color name="orange">#F59E0B</color>
+    <color name="green">#10B981</color>
+    <color name="red">#EF4444</color>
+
     <!-- Status colors -->
     <color name="status_resolved">#15803d</color>
     <color name="status_deleted">#dc2626</color>

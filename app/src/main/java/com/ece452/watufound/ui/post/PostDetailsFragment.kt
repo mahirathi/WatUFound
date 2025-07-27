@@ -60,6 +60,7 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         val labelRoom: TextView = view.findViewById(R.id.labelRoom)
         val textDateTime: TextView = view.findViewById(R.id.textDateTime)
         val textPostedBy: TextView = view.findViewById(R.id.textPostedBy)
+        val adminIndicator: TextView = view.findViewById(R.id.adminIndicator)
         val buttonContact: LinearLayout = view.findViewById(R.id.buttonContact)
         val labelDateTime: TextView = view.findViewById(R.id.labelDateTime)
         val textDateTimeCreated: TextView = view.findViewById(R.id.textDateTimeCreated)
@@ -142,11 +143,39 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         android.util.Log.d("PostDetailsFragment", "Received data - userId: '$userId', userName: '$userName'")
         android.util.Log.d("PostDetailsFragment", "Arguments: $arguments")
         
-        // Set Posted By
-        textPostedBy.text = if (isAnonymous == true) "Anonymous" else userName
-        
-        // Check if this is the current user's post
+        // Check if current user is admin
         val currentUser = FirebaseAuth.getInstance().currentUser
+        val isAdmin = currentUser?.email?.endsWith("@admin.watufound.com") == true ||
+                     currentUser?.email == "admin@watufound.com"
+
+        android.util.Log.d("PostDetailsFragment", "Current user: ${currentUser?.email}, isAdmin: $isAdmin")
+
+        // Set Posted By - show actual user name for admins even if posted anonymously
+        if (isAnonymous == true && isAdmin) {
+            textPostedBy.text = "Anonymous (Posted by: $userName)"
+            adminIndicator.visibility = View.VISIBLE
+            android.util.Log.d("PostDetailsFragment", "Showing admin view for anonymous post by: $userName")
+        } else if (isAnonymous == true) {
+            textPostedBy.text = "Anonymous"
+            adminIndicator.visibility = View.GONE
+            android.util.Log.d("PostDetailsFragment", "Showing regular anonymous view")
+        } else {
+            textPostedBy.text = userName
+            adminIndicator.visibility = View.GONE
+            android.util.Log.d("PostDetailsFragment", "Showing regular user view for: $userName")
+        }
+
+        // Show delete button for admin users, but hide if admin is viewing their own post
+        val buttonDeletePost: Button = view.findViewById(R.id.buttonDeletePost)
+        if (isAdmin && currentUser?.uid != userId) {
+            buttonDeletePost.visibility = View.VISIBLE
+            android.util.Log.d("PostDetailsFragment", "Showing delete button for admin viewing another user's post")
+        } else {
+            buttonDeletePost.visibility = View.GONE
+            android.util.Log.d("PostDetailsFragment", "Hiding delete button - not admin or admin viewing own post")
+        }
+
+        // Check if this is the current user's post
         if (currentUser?.uid == userId) {
             android.util.Log.d("PostDetailsFragment", "This is the current user's post")
             buttonContact.isEnabled = false
@@ -167,6 +196,14 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             // Show the chat icon for "Start Conversation" button
             val chatIcon = buttonContact.findViewById<android.widget.ImageView>(R.id.chatIcon)
             chatIcon?.visibility = android.view.View.VISIBLE
+            // Set contact button text based on anonymity and admin status
+            if (isAnonymous == true && isAdmin) {
+                buttonContactText.text = "Contact $userName"
+            } else if (isAnonymous == true) {
+                buttonContactText.text = "Contact Anonymous"
+            } else {
+                buttonContactText.text = "Contact $userName"
+            }
         }
         
         // Populate data based on post type
@@ -232,6 +269,8 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 chatIcon?.visibility = android.view.View.GONE
                 return@setOnClickListener
             }
+            // For conversation, always use "Anonymous" for anonymous posts (even for admins)
+            // This maintains privacy in conversations while still showing admin info in UI
             val posterName = if (isAnonymous == true) "Anonymous" else userName
             val postTitleForConv = itemTitle
             val db = FirebaseDatabase.getInstance().reference
@@ -288,6 +327,23 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
+        // Set up delete button for admin users
+        buttonDeletePost.setOnClickListener {
+            if (!isAdmin) {
+                return@setOnClickListener
+            }
+
+            // Show confirmation dialog
+            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Delete Post")
+                .setMessage("Are you sure you want to delete this post? This action cannot be undone.")
+                .setPositiveButton("Delete") { _, _ ->
+                    deletePost(userId, postType, itemTitle)
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+
         // Set up resolve and delete button click listeners
         buttonResolve.setOnClickListener {
             handleResolvePost(postType, itemTitle, userId, dateTimeCreated)
@@ -296,6 +352,53 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         buttonDelete.setOnClickListener {
             handleDeletePost(postType, itemTitle, userId, dateTimeCreated)
         }
+    }
+
+    private fun deletePost(userId: String?, postType: String?, itemTitle: String?) {
+        if (userId.isNullOrEmpty() || postType.isNullOrEmpty() || itemTitle.isNullOrEmpty()) {
+            android.util.Log.e("PostDetailsFragment", "Cannot delete post: missing required data")
+            android.widget.Toast.makeText(requireContext(), "Cannot delete post: missing data", android.widget.Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        android.util.Log.d("PostDetailsFragment", "Attempting to delete post - userId: $userId, postType: $postType, itemTitle: $itemTitle")
+
+        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        val collectionName = if (postType == "lost") "lost_items" else "found_items"
+
+        android.util.Log.d("PostDetailsFragment", "Looking in collection: $collectionName")
+
+        // Find and delete the post from Firestore
+        db.collection(collectionName)
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("itemTitle", itemTitle)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                android.util.Log.d("PostDetailsFragment", "Found ${querySnapshot.size()} matching posts")
+
+                if (querySnapshot.isEmpty) {
+                    android.util.Log.e("PostDetailsFragment", "No posts found matching criteria")
+                    android.widget.Toast.makeText(requireContext(), "Post not found in database", android.widget.Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+
+                // Delete the first matching post (should be unique based on userId + itemTitle)
+                val documentToDelete = querySnapshot.documents.first()
+                documentToDelete.reference.delete()
+                    .addOnSuccessListener {
+                        android.util.Log.d("PostDetailsFragment", "Post deleted successfully")
+                        // Navigate back to feed
+                        findNavController().navigateUp()
+                    }
+                    .addOnFailureListener { exception ->
+                        android.util.Log.e("PostDetailsFragment", "Failed to delete post", exception)
+                        android.widget.Toast.makeText(requireContext(), "Failed to delete post: ${exception.message}", android.widget.Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .addOnFailureListener { exception ->
+                android.util.Log.e("PostDetailsFragment", "Failed to find post for deletion", exception)
+                android.widget.Toast.makeText(requireContext(), "Failed to access database: ${exception.message}", android.widget.Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun formatDateTime(dateTimeString: String): String {

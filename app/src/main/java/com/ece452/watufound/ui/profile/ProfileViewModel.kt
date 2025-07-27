@@ -183,29 +183,29 @@ class ProfileViewModel : ViewModel() {
             currentUser.reauthenticate(credential)
                 .addOnCompleteListener { reauthTask ->
                     if (reauthTask.isSuccessful) {
-                        // Now update the email
-                        currentUser.updateEmail(newEmail)
-                            .addOnCompleteListener { emailTask ->
-                                if (emailTask.isSuccessful) {
-                                    Log.d("ProfileViewModel", "Email updated successfully")
-                                    _userEmail.value = newEmail
-                                    
-                                    // Also update in Firestore
-                                    db.collection("users").document(currentUser.uid)
-                                        .update("email", newEmail)
-                                        .addOnSuccessListener {
-                                            Log.d("ProfileViewModel", "Email updated in Firestore")
-                                        }
-                                        .addOnFailureListener { e ->
-                                            Log.e("ProfileViewModel", "Failed to update email in Firestore", e)
-                                        }
-                                } else {
-                                    Log.e("ProfileViewModel", "Failed to update email", emailTask.exception)
-                                    _updateStatus.value = "Failed to update email: ${emailTask.exception?.message}"
-                                }
-                                updateCount++
-                                checkUpdateCompletion(totalUpdates, updateCount)
+                        // Now update the email using the newer API
+                        val emailUpdateTask = currentUser.updateEmail(newEmail)
+                        emailUpdateTask.addOnCompleteListener { emailTask ->
+                            if (emailTask.isSuccessful) {
+                                Log.d("ProfileViewModel", "Email updated successfully")
+                                _userEmail.value = newEmail
+                                
+                                // Also update in Firestore
+                                db.collection("users").document(currentUser.uid)
+                                    .update("email", newEmail)
+                                    .addOnSuccessListener {
+                                        Log.d("ProfileViewModel", "Email updated in Firestore")
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.e("ProfileViewModel", "Failed to update email in Firestore", e)
+                                    }
+                            } else {
+                                Log.e("ProfileViewModel", "Failed to update email", emailTask.exception)
+                                _updateStatus.value = "Failed to update email: ${emailTask.exception?.message}"
                             }
+                            updateCount++
+                            checkUpdateCompletion(totalUpdates, updateCount)
+                        }
                     } else {
                         Log.e("ProfileViewModel", "Re-authentication failed", reauthTask.exception)
                         _updateStatus.value = "Authentication failed: ${reauthTask.exception?.message}"
