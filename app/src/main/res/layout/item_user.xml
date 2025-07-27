@@ -19,41 +19,41 @@
         android:gravity="center_vertical">
 
         <!-- Post Image on the left with proper spacing -->
-        <FrameLayout
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginEnd="16dp">
+<!--        <FrameLayout-->
+<!--            android:layout_width="60dp"-->
+<!--            android:layout_height="60dp"-->
+<!--            android:layout_marginEnd="16dp">-->
 
-            <ImageView
-                android:id="@+id/imagePost"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_image_upload"
-                android:scaleType="centerCrop"
-                android:background="@drawable/rounded_card_background"
-                android:contentDescription="Post image" />
+<!--&lt;!&ndash;            <ImageView&ndash;&gt;-->
+<!--&lt;!&ndash;                android:id="@+id/imagePost"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_width="match_parent"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_height="match_parent"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:src="@drawable/ic_image_upload"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:scaleType="centerCrop"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:background="@drawable/rounded_card_background"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:contentDescription="Post image" />&ndash;&gt;-->
 
-            <!-- Fallback icon for when no image is available -->
-            <ImageView
-                android:id="@+id/imageFallback"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_image_placeholder"
-                android:visibility="gone"
-                android:contentDescription="No image available" />
+<!--            &lt;!&ndash; Fallback icon for when no image is available &ndash;&gt;-->
+<!--            <ImageView-->
+<!--                android:id="@+id/imageFallback"-->
+<!--                android:layout_width="24dp"-->
+<!--                android:layout_height="24dp"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:src="@drawable/ic_image_placeholder"-->
+<!--                android:visibility="gone"-->
+<!--                android:contentDescription="No image available" />-->
 
-        </FrameLayout>
+<!--        </FrameLayout>-->
 
         <!-- User Avatar -->
         <ImageView
-            android:id="@+id/userAvatar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_person_black_24dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginEnd="20dp"
             android:background="@drawable/profile_picture_background"
-            android:scaleType="centerCrop"
-            android:layout_marginEnd="16dp" />
+            android:src="@drawable/ic_person_black_24dp"
+            android:padding="16dp"
+            app:tint="@color/white" />
 
         <!-- Text content in the middle with better spacing -->
         <LinearLayout
@@ -74,16 +74,16 @@
                 android:ellipsize="end"
                 tools:text="Alice Johnson" />
 
-            <TextView
-                android:id="@+id/textPostTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="@color/darker_gray"
-                android:textSize="14sp"
-                android:maxLines="2"
-                android:ellipsize="end"
-                tools:text="Lost Wallet at SLC" />
+<!--            <TextView-->
+<!--                android:id="@+id/textPostTitle"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="4dp"-->
+<!--                android:textColor="@color/darker_gray"-->
+<!--                android:textSize="14sp"-->
+<!--                android:maxLines="2"-->
+<!--                android:ellipsize="end"-->
+<!--                tools:text="Lost Wallet at SLC" />-->
 
             <TextView
                 android:id="@+id/userEmail"

@@ -23,7 +23,7 @@ class UpdateProfileFragment : Fragment() {
     ): View {
         Log.d("UpdateProfileFragment", "onCreateView called")
         
-        val profileViewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
+        val profileViewModel = ViewModelProvider(requireActivity()).get(ProfileViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_update_profile, container, false)
 
         // Find views
@@ -32,7 +32,7 @@ class UpdateProfileFragment : Fragment() {
         val passwordEditText = root.findViewById<EditText>(R.id.passwordEditText)
         val updateProfileButton = root.findViewById<Button>(R.id.updateProfileButton)
         val loadingIndicator = root.findViewById<ProgressBar>(R.id.loadingIndicator)
-        val backButton = root.findViewById<android.widget.ImageButton>(R.id.backButton)
+        val backButton = root.findViewById<android.widget.ImageView>(R.id.backButton)
 
         // Set up back button
         backButton?.setOnClickListener {

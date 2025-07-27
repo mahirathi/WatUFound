@@ -28,7 +28,7 @@ class ProfileFragment : Fragment() {
         Log.d("DashboardFragment", "onCreateView called")
         
         val dashboardViewModel =
-            ViewModelProvider(this).get(ProfileViewModel::class.java)
+            ViewModelProvider(requireActivity()).get(ProfileViewModel::class.java)
 
         val root = inflater.inflate(R.layout.fragment_profile, container, false)
         Log.d("DashboardFragment", "Layout inflated successfully")

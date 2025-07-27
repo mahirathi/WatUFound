@@ -165,15 +165,14 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             android.util.Log.d("PostDetailsFragment", "Showing regular user view for: $userName")
         }
 
-        // Show delete button for admin users
+        // Show delete button for admin users, but hide if admin is viewing their own post
         val buttonDeletePost: Button = view.findViewById(R.id.buttonDeletePost)
-        if (isAdmin) {
+        if (isAdmin && currentUser?.uid != userId) {
             buttonDeletePost.visibility = View.VISIBLE
-            android.util.Log.d("PostDetailsFragment", "Showing delete button for admin")
-            android.util.Log.d("PostDetailsFragment", "Admin delete button visibility set to VISIBLE")
+            android.util.Log.d("PostDetailsFragment", "Showing delete button for admin viewing another user's post")
         } else {
             buttonDeletePost.visibility = View.GONE
-            android.util.Log.d("PostDetailsFragment", "Admin delete button visibility set to GONE (not admin)")
+            android.util.Log.d("PostDetailsFragment", "Hiding delete button - not admin or admin viewing own post")
         }
 
         // Check if this is the current user's post

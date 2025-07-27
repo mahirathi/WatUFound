@@ -43,7 +43,7 @@ class UserAdapter(
     override fun getItemCount(): Int = users.size
 
     inner class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val userAvatar: ImageView = itemView.findViewById(R.id.userAvatar)
+//        private val userAvatar: ImageView = itemView.findViewById(R.id.userAvatar)
         private val userName: TextView = itemView.findViewById(R.id.textUserName)
         private val userEmail: TextView = itemView.findViewById(R.id.userEmail)
         private val userStatus: TextView = itemView.findViewById(R.id.userStatus)
