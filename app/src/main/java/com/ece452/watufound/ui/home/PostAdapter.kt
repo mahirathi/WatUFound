@@ -41,6 +41,7 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
         private val textLocation: TextView = itemView.findViewById(R.id.textBuilding)
         private val textTime: TextView = itemView.findViewById(R.id.textTime)
         private val buttonArrow: ImageButton = itemView.findViewById(R.id.buttonArrow)
+        private val textResolved: TextView = itemView.findViewById(R.id.textResolved)
 
         fun bind(item: FeedItem) {
             // Create navigation bundle based on item type
@@ -96,12 +97,12 @@ class PostAdapter(private var posts: List<FeedItem>) : RecyclerView.Adapter<Post
                 is FeedItem.Lost -> item.item.isResolved
                 is FeedItem.Found -> item.item.isResolved
             }
+            
+            // Show resolved status indicator
             if (isResolved) {
-                // buttonResolve.visibility = View.GONE
-                // buttonDelete.visibility = View.GONE
+                textResolved.visibility = View.VISIBLE
             } else {
-                // buttonResolve.visibility = View.VISIBLE
-                // buttonDelete.visibility = View.VISIBLE
+                textResolved.visibility = View.GONE
             }
 
             // Load image if available

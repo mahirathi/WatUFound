@@ -19,27 +19,26 @@ import java.util.Locale
 import androidx.navigation.fragment.findNavController
 import com.ece452.watufound.R
 import java.util.Calendar
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 import com.ece452.watufound.utils.BuildingLocationUtils
 import android.net.Uri
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import android.util.Log
 
 
-class LostFormFragment : Fragment(), OnMapReadyCallback {
+class LostFormFragment : Fragment() {
 
     private var _binding: FragmentLostFormBinding? = null
     private val binding get() = _binding!!
     private val viewModel: LostFormViewModel by viewModels()
     val sdf = SimpleDateFormat("yyyy-MM-dd, HH:mm", Locale.getDefault())
     private var mapView: MapView? = null
-    private var googleMap: GoogleMap? = null
-    private var lastPin: LatLng? = null
+    private var lastPin: GeoPoint? = null
     private var selectedImageUri: Uri? = null
     private lateinit var imagePickerLauncher: ActivityResultLauncher<String>
 
@@ -59,8 +58,28 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
     ): View {
         _binding = FragmentLostFormBinding.inflate(inflater, container, false)
         mapView = _binding?.root?.findViewById(R.id.mapViewPreview)
-        mapView?.onCreate(savedInstanceState)
-        mapView?.getMapAsync(this)
+        
+        Log.d("MAP_DEBUG", "=== LOST FORM MAP INIT ===")
+        Log.d("MAP_DEBUG", "MapView found: ${mapView != null}")
+        
+        // Configure osmdroid
+        Configuration.getInstance().load(requireContext(), requireContext().getSharedPreferences("osmdroid", 0))
+        
+        // Set up the map
+        mapView?.setTileSource(TileSourceFactory.MAPNIK)
+        mapView?.setMultiTouchControls(true)
+        mapView?.isTilesScaledToDpi = true
+        
+        // Set initial view to Waterloo campus area
+        mapView?.controller?.setCenter(GeoPoint(43.4723, -80.5449)) // Waterloo campus coordinates
+        mapView?.controller?.setZoom(15.0)
+        
+        // Ensure map is visible
+        mapView?.visibility = View.VISIBLE
+        mapView?.setBackgroundColor(requireContext().getColor(android.R.color.darker_gray))
+        
+        Log.d("MAP_DEBUG", "Lost form map setup completed")
+        
         return binding.root
     }
 
@@ -157,7 +176,7 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
                 return@setOnClickListener
             }
 
-            if (lastSeenAt == "Select Location") {
+            if (lastSeenAt.isBlank()) {
                 Toast.makeText(requireContext(), "Please select a valid location.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -253,7 +272,6 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
         }
 
         val locations = listOf(
-            "Select Location",  // Placeholder
             "Accelerator Centre Waterloo (ACW)",
             "Arts Lecture Hall (AL)",
             "Brubacher House (BRH)",
@@ -298,83 +316,84 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
 
 
     private fun updateMapForLocation(location: String?) {
-        if (location.isNullOrBlank() || location == "Select Location" || location == "Other") {
-            googleMap?.clear()
+        Log.d("MAP_DEBUG", "Lost form updateMapForLocation called with: '$location'")
+        Log.d("MAP_DEBUG", "Lost form MapView is null: ${mapView == null}")
+        
+        if (location.isNullOrBlank()) {
+            Log.d("MAP_DEBUG", "Lost form: Location is empty, clearing map")
+            mapView?.overlays?.clear()
+            mapView?.invalidate()
             binding.mapViewPreview.visibility = View.GONE
             return
         }
         
-        val latLng = BuildingLocationUtils.getBuildingLatLng(requireContext(), location)
-        if (latLng != null) {
-            // Show the map
+        if (location == "Other") {
+            Log.d("MAP_DEBUG", "Lost form: Showing general UW area for 'Other'")
             binding.mapViewPreview.visibility = View.VISIBLE
             
-            googleMap?.clear()
-            googleMap?.addMarker(MarkerOptions().position(latLng).title(location))
-            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
-            lastPin = latLng
+            // Clear any existing markers
+            mapView?.overlays?.clear()
+            
+            // Center on general University of Waterloo area
+            val uwCenter = GeoPoint(43.470341, -80.544251)
+            mapView?.controller?.setCenter(uwCenter)
+            mapView?.controller?.setZoom(14.0) // Zoom out to show general area
+            mapView?.invalidate()
+            return
+        }
+        
+        val geoPoint = BuildingLocationUtils.getBuildingGeoPoint(requireContext(), location!!)
+        Log.d("MAP_DEBUG", "Lost form GeoPoint for '$location': $geoPoint")
+        
+        if (geoPoint != null) {
+            Log.d("MAP_DEBUG", "Lost form: Setting up marker for location: $location")
+            binding.mapViewPreview.visibility = View.VISIBLE
+            
+            mapView?.overlays?.clear()
+            val marker = Marker(mapView)
+            marker.position = geoPoint
+            marker.title = location
+            
+            // Create a modern pin appearance
+            marker.icon = requireContext().getDrawable(R.drawable.ic_red_map_pin)
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            
+            mapView?.overlays?.add(marker)
+            mapView?.controller?.setCenter(geoPoint)
+            mapView?.controller?.setZoom(17.0)
+            mapView?.invalidate()
+            lastPin = geoPoint
+            Log.d("MAP_DEBUG", "Lost form: Map updated successfully")
         } else {
             // Hide the map if coordinates not found
+            Log.d("MAP_DEBUG", "Lost form: Could not find coordinates, hiding map")
             binding.mapViewPreview.visibility = View.GONE
-            googleMap?.clear()
+            mapView?.overlays?.clear()
+            mapView?.invalidate()
         }
-    }
-
-    override fun onMapReady(map: GoogleMap) {
-        googleMap = map
-        // Enable zoom controls
-        googleMap?.uiSettings?.isZoomControlsEnabled = true
-        
-        // Apply purple theme styling
-        val purpleStyle = """
-            [
-                {
-                    "featureType": "all",
-                    "elementType": "geometry.fill",
-                    "stylers": [
-                        {
-                            "color": "#f3e5f5"
-                        }
-                    ]
-                },
-                {
-                    "featureType": "water",
-                    "elementType": "geometry",
-                    "stylers": [
-                        {
-                            "color": "#e1bee7"
-                        }
-                    ]
-                },
-                {
-                    "featureType": "road",
-                    "elementType": "geometry",
-                    "stylers": [
-                        {
-                            "color": "#f8f0ff"
-                        }
-                    ]
-                }
-            ]
-        """.trimIndent()
-        
-        try {
-            val mapStyleOptions = com.google.android.gms.maps.model.MapStyleOptions(purpleStyle)
-            googleMap?.setMapStyle(mapStyleOptions)
-        } catch (e: Exception) {
-            android.util.Log.e("LostFormFragment", "Map styling failed", e)
-        }
-        
-        // If a location was already selected, show it
-        val location = binding.lastSeenAtInput.text.toString()
-        updateMapForLocation(location)
     }
 
     // MapView lifecycle
-    override fun onResume() { super.onResume(); mapView?.onResume() }
-    override fun onPause() { super.onPause(); mapView?.onPause() }
-    override fun onDestroyView() { super.onDestroyView(); mapView?.onDestroy(); _binding = null }
-    override fun onLowMemory() { super.onLowMemory(); mapView?.onLowMemory() }
+    override fun onResume() { 
+        super.onResume()
+        mapView?.onResume()
+    }
+    
+    override fun onPause() { 
+        super.onPause()
+        mapView?.onPause()
+    }
+    
+    override fun onDestroyView() { 
+        super.onDestroyView()
+        mapView?.onDetach()
+        _binding = null
+    }
+    
+    override fun onLowMemory() { 
+        super.onLowMemory()
+        mapView?.onDetach()
+    }
 
     private fun checkUserBanStatus() {
         val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser

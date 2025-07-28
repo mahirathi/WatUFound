@@ -97,6 +97,21 @@
                 android:dropDownHeight="200dp"
                 android:completionThreshold="1" />
 
+    <!-- Map Preview -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_card_background"
+        android:clipToOutline="true">
+
+        <org.osmdroid.views.MapView
+            android:id="@+id/mapViewPreview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
+
             <!-- Room Number -->
             <TextView
                 style="@style/TextLabel"
@@ -108,14 +123,6 @@
                 android:hint="e.g: E7-4452"
                 android:inputType="text"
                 android:layout_marginBottom="16dp" />
-
-    <!-- Map Preview -->
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapViewPreview"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginBottom="16dp"
-        android:visibility="gone" />
 
 
             <!-- Date & Time -->
