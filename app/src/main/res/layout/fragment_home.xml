@@ -7,19 +7,74 @@
     android:background="@color/feed_background"
     tools:context=".ui.home.HomeFragment">
 
-    <!-- Refresh Button -->
-    <ImageButton
-        android:id="@+id/buttonRefresh"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+<!--    &lt;!&ndash; Refresh Button &ndash;&gt;-->
+<!--    <ImageButton-->
+<!--        android:id="@+id/buttonRefresh"-->
+<!--        android:layout_width="48dp"-->
+<!--        android:layout_height="48dp"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:background="?attr/selectableItemBackgroundBorderless"-->
+<!--        android:src="@drawable/ic_refresh"-->
+<!--        android:contentDescription="Refresh feed"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:tint="@color/purple_700" />-->
+
+    <!-- Search and Filter Bar -->
+    <LinearLayout
+        android:id="@+id/searchFilterBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_refresh"
-        android:contentDescription="Refresh feed"
+        android:gravity="center_vertical"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@color/purple_700" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Search Bar -->
+        <EditText
+            android:id="@+id/searchEditText"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/input_field_background"
+            android:hint="Search posts..."
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textSize="15sp"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1" />
+
+        <!-- Search Button -->
+        <ImageButton
+            android:id="@+id/buttonSearch"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/input_field_background"
+            android:src="@drawable/ic_search_black_24dp"
+            android:contentDescription="Search posts"
+            app:tint="@color/purple_700"
+            android:padding="12dp" />
+
+        <!-- Filter Button -->
+        <ImageButton
+            android:id="@+id/buttonFilter"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/input_field_background"
+            android:src="@drawable/ic_filter"
+            android:contentDescription="Filter posts"
+            app:tint="@color/purple_700"
+            android:padding="12dp" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/filterBar"
@@ -33,7 +88,7 @@
         android:background="@drawable/tab_container_background"
         android:padding="4dp"
         android:clipToOutline="true"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/searchFilterBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

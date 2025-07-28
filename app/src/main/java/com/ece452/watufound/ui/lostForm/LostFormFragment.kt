@@ -26,6 +26,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.ece452.watufound.utils.BuildingLocationUtils
+import com.ece452.watufound.utils.CategoryUtils
 import android.net.Uri
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -222,25 +223,15 @@ class LostFormFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupSpinners() {
-        val categories = listOf(
-            "Select Category",  // Placeholder
-            "Accessories",
-            "Clothing",
-            "Documents",
-            "Electronics",
-            "Other",
-            "WatCard"
-        )
+        val categories = listOf("Select Category") + CategoryUtils.getSelectableCategories()
         val categoryAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.categorySpinner.adapter = categoryAdapter
 
-        val restrictedCategories = listOf("WatCard")
-
         binding.categorySpinner.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: android.widget.AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedCategory = parent.getItemAtPosition(position).toString()
-                if (restrictedCategories.contains(selectedCategory)) {
+                if (CategoryUtils.isImageRestricted(selectedCategory)) {
                     binding.buttonSelectImage.isEnabled = false
                     selectedImageUri = null
                     binding.imagePreview.setImageResource(R.drawable.ic_image_upload)
