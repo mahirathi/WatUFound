@@ -11,37 +11,34 @@ import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import com.ece452.watufound.R
 import com.ece452.watufound.databinding.FragmentFoundFormBinding
 import com.ece452.watufound.models.FoundItem
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import androidx.navigation.fragment.findNavController
+import com.ece452.watufound.R
+import java.util.Calendar
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 import com.ece452.watufound.utils.BuildingLocationUtils
 import com.ece452.watufound.utils.CategoryUtils
 import android.net.Uri
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 
-class FoundFormFragment : Fragment(), OnMapReadyCallback {
+
+class FoundFormFragment : Fragment() {
 
     private var _binding: FragmentFoundFormBinding? = null
     private val binding get() = _binding!!
-    val sdf = SimpleDateFormat("yyyy-MM-dd, HH:mm", Locale.getDefault())
-
     private val viewModel: FoundFormViewModel by viewModels()
-
+    val sdf = SimpleDateFormat("yyyy-MM-dd, HH:mm", Locale.getDefault())
     private var mapView: MapView? = null
-    private var googleMap: GoogleMap? = null
-    private var lastPin: LatLng? = null
+    private var lastPin: GeoPoint? = null
     private var selectedImageUri: Uri? = null
     private lateinit var imagePickerLauncher: ActivityResultLauncher<String>
 
@@ -60,11 +57,20 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentFoundFormBinding.inflate(inflater, container, false)
-        val view = _binding?.root ?: FragmentFoundFormBinding.inflate(inflater, container, false).root
-        mapView = view.findViewById(R.id.mapViewPreview)
-        mapView?.onCreate(savedInstanceState)
-        mapView?.getMapAsync(this)
-        return view
+        mapView = _binding?.root?.findViewById(R.id.mapViewPreview)
+        
+        // Configure osmdroid
+        Configuration.getInstance().load(requireContext(), requireContext().getSharedPreferences("osmdroid", 0))
+        
+        // Set up the map
+        mapView?.setTileSource(TileSourceFactory.MAPNIK)
+        mapView?.setMultiTouchControls(true)
+        
+        // Set initial view to Waterloo campus area
+        mapView?.controller?.setCenter(GeoPoint(43.4723, -80.5449)) // Waterloo campus coordinates
+        mapView?.controller?.setZoom(15.0)
+        
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -167,7 +173,7 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
                 return@setOnClickListener
             }
 
-            if (foundAt == "Select Location") {
+            if (foundAt.isBlank()) {
                 Toast.makeText(requireContext(), "Please select a valid location.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -246,7 +252,6 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
         }
 
         val locations = listOf(
-            "Select Location", //placeholder
             "Accelerator Centre Waterloo (ACW)",
             "Arts Lecture Hall (AL)",
             "Brubacher House (BRH)",
@@ -290,76 +295,51 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun updateMapForLocation(location: String?) {
-        if (location.isNullOrBlank() || location == "Select Location" || location == "Other") {
-            googleMap?.clear()
+        if (location.isNullOrBlank()) {
+            mapView?.overlays?.clear()
+            mapView?.invalidate()
             binding.mapViewPreview.visibility = View.GONE
             return
         }
         
-        val latLng = BuildingLocationUtils.getBuildingLatLng(requireContext(), location)
-        if (latLng != null) {
-            // Show the map
+        if (location == "Other") {
             binding.mapViewPreview.visibility = View.VISIBLE
             
-            googleMap?.clear()
-            googleMap?.addMarker(MarkerOptions().position(latLng).title(location))
-            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
-            lastPin = latLng
+            // Clear any existing markers
+            mapView?.overlays?.clear()
+            
+            // Center on general University of Waterloo area
+            val uwCenter = GeoPoint(43.470341, -80.544251)
+            mapView?.controller?.setCenter(uwCenter)
+            mapView?.controller?.setZoom(14.0) // Zoom out to show general area
+            mapView?.invalidate()
+            return
+        }
+        
+        val geoPoint = BuildingLocationUtils.getBuildingGeoPoint(requireContext(), location!!)
+        if (geoPoint != null) {
+            binding.mapViewPreview.visibility = View.VISIBLE
+            
+            mapView?.overlays?.clear()
+            val marker = Marker(mapView)
+            marker.position = geoPoint
+            marker.title = location
+            
+            // Create a modern pin appearance
+            marker.icon = requireContext().getDrawable(R.drawable.ic_red_map_pin)
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            
+            mapView?.overlays?.add(marker)
+            mapView?.controller?.setCenter(geoPoint)
+            mapView?.controller?.setZoom(17.0)
+            mapView?.invalidate()
+            lastPin = geoPoint
         } else {
             // Hide the map if coordinates not found
             binding.mapViewPreview.visibility = View.GONE
-            googleMap?.clear()
+            mapView?.overlays?.clear()
+            mapView?.invalidate()
         }
-    }
-
-    override fun onMapReady(map: GoogleMap) {
-        googleMap = map
-        // Enable zoom controls
-        googleMap?.uiSettings?.isZoomControlsEnabled = true
-        
-        // Apply purple theme styling
-        val purpleStyle = """
-            [
-                {
-                    "featureType": "all",
-                    "elementType": "geometry.fill",
-                    "stylers": [
-                        {
-                            "color": "#f3e5f5"
-                        }
-                    ]
-                },
-                {
-                    "featureType": "water",
-                    "elementType": "geometry",
-                    "stylers": [
-                        {
-                            "color": "#e1bee7"
-                        }
-                    ]
-                },
-                {
-                    "featureType": "road",
-                    "elementType": "geometry",
-                    "stylers": [
-                        {
-                            "color": "#f8f0ff"
-                        }
-                    ]
-                }
-            ]
-        """.trimIndent()
-        
-        try {
-            val mapStyleOptions = com.google.android.gms.maps.model.MapStyleOptions(purpleStyle)
-            googleMap?.setMapStyle(mapStyleOptions)
-        } catch (e: Exception) {
-            android.util.Log.e("FoundFormFragment", "Map styling failed", e)
-        }
-        
-        // If a location was already selected, show it
-        val location = binding.foundAtInput.text.toString()
-        updateMapForLocation(location)
     }
 
     private fun checkUserBanStatus() {
@@ -435,8 +415,24 @@ class FoundFormFragment : Fragment(), OnMapReadyCallback {
     }
 
     // MapView lifecycle
-    override fun onResume() { super.onResume(); mapView?.onResume() }
-    override fun onPause() { super.onPause(); mapView?.onPause() }
-    override fun onDestroyView() { super.onDestroyView(); mapView?.onDestroy(); _binding = null }
-    override fun onLowMemory() { super.onLowMemory(); mapView?.onLowMemory() }
+    override fun onResume() { 
+        super.onResume()
+        mapView?.onResume()
+    }
+    
+    override fun onPause() { 
+        super.onPause()
+        mapView?.onPause()
+    }
+    
+    override fun onDestroyView() { 
+        super.onDestroyView()
+        mapView?.onDetach()
+        _binding = null
+    }
+    
+    override fun onLowMemory() { 
+        super.onLowMemory()
+        mapView?.onDetach()
+    }
 }

@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.recyclerview.widget.RecyclerView
+import androidx.navigation.fragment.findNavController
 
 class AdminUsersFragment : Fragment() {
 
@@ -41,6 +42,7 @@ class AdminUsersFragment : Fragment() {
 
         setupRecyclerView()
         setupSearch()
+        setupBackButton()
         loadUsers()
 
         return root
@@ -83,6 +85,13 @@ class AdminUsersFragment : Fragment() {
             })
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Error setting up search: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setupBackButton() {
+        binding.backButton.setOnClickListener {
+            // Navigate back to the Profile tab
+            findNavController().navigate(R.id.navigation_profile)
         }
     }
 

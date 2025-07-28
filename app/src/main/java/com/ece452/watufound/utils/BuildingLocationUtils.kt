@@ -1,30 +1,30 @@
 package com.ece452.watufound.utils
 
 import android.content.Context
-import com.google.android.gms.maps.model.LatLng
+import org.osmdroid.util.GeoPoint
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
 object BuildingLocationUtils {
-    private var buildingMap: Map<String, LatLng>? = null
+    private var buildingMap: Map<String, GeoPoint>? = null
 
     // Map dropdown names to CSV building names/codes
     private val dropdownToCsvName = mapOf(
         "Accelerator Centre Waterloo (ACW)" to "Accelerator Centre Waterloo",
         "Arts Lecture Hall (AL)" to "Arts Lecture Hall",
-        "Brubacher House (BRH)" to "Brubacher House (BRH)",
+        "Brubacher House (BRH)" to "Brubacher House",
         "Centre for Environmental & Information Technology (EIT)" to "Centre for Environmental and Information Technology",
         "Central Services Building (CSB)" to "Central Services Building",
         "Dana Porter Library (DP)" to "Dana Porter Arts Library",
-        "Davis Centre Library (DC)" to "Davis Centre Library (DC)",
+        "Davis Centre Library (DC)" to "William G. Davis Computer Research Centre",
         "Douglas Wright Engineering Building (DWE)" to "Douglas Wright Engineering Building",
         "East Campus Hall (ECH)" to "East Campus Hall",
         "Earth Sciences & Chemistry (ESC)" to "Earth Sciences & Chemistry",
         "Engineering 2 (E2)" to "Engineering 2",
         "Engineering 3 (E3)" to "Engineering 3",
-        "Engineering 5 (E5)" to "Engineering Building 5 (E5)",
-        "Engineering 6 (E6)" to "Engineering Building 6 (E6)",
-        "Engineering 7 (E7)" to "Engineering Building 7 (E7)",
+        "Engineering 5 (E5)" to "Engineering 5",
+        "Engineering 6 (E6)" to "Engineering 6",
+        "Engineering 7 (E7)" to "Engineering 7",
         "Energy Research Centre (ERC)" to "Energy Research Centre",
         "Environment 1 (EV1)" to "Environment 1",
         "Environment 2 (EV2)" to "Environment 2",
@@ -47,7 +47,7 @@ object BuildingLocationUtils {
         "University Club (UC)" to "University Club"
     )
 
-    fun getBuildingLatLng(context: Context, dropdownName: String): LatLng? {
+    fun getBuildingGeoPoint(context: Context, dropdownName: String): GeoPoint? {
         if (buildingMap == null) {
             buildingMap = loadBuildingMap(context)
         }
@@ -63,8 +63,8 @@ object BuildingLocationUtils {
         return result
     }
 
-    private fun loadBuildingMap(context: Context): Map<String, LatLng> {
-        val map = mutableMapOf<String, LatLng>()
+    private fun loadBuildingMap(context: Context): Map<String, GeoPoint> {
+        val map = mutableMapOf<String, GeoPoint>()
         val assetManager = context.assets
         assetManager.open("Buildings.csv").use { inputStream ->
             BufferedReader(InputStreamReader(inputStream)).use { reader ->
@@ -76,7 +76,7 @@ object BuildingLocationUtils {
                         val lat = tokens[5].toDoubleOrNull()
                         val lng = tokens[6].toDoubleOrNull()
                         if (lat != null && lng != null) {
-                            map[name] = LatLng(lat, lng)
+                            map[name] = GeoPoint(lat, lng)
                         }
                     }
                 }

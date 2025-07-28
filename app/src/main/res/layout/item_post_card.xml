@@ -26,6 +26,22 @@
             android:contentDescription="Post image preview"
             android:visibility="gone" />
 
+        <!-- Resolved Status Indicator -->
+        <TextView
+            android:id="@+id/textResolved"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✓ Resolved"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:textColor="@color/status_resolved"
+            android:background="@drawable/rounded_card_background"
+            android:backgroundTint="@color/found_background"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

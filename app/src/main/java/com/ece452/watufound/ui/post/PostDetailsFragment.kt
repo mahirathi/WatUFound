@@ -13,12 +13,11 @@ import com.ece452.watufound.R
 import com.ece452.watufound.utils.TimeUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 import com.ece452.watufound.utils.BuildingLocationUtils
 import android.widget.ImageView
 import com.bumptech.glide.Glide
@@ -27,11 +26,11 @@ import com.google.firebase.firestore.firestore
 import java.text.SimpleDateFormat
 import java.util.Locale
 import android.widget.LinearLayout
+import android.util.Log
 
-class PostDetailsFragment : Fragment(), OnMapReadyCallback {
+class PostDetailsFragment : Fragment() {
     private var mapView: MapView? = null
-    private var googleMap: GoogleMap? = null
-    private var lastPin: LatLng? = null
+    private var lastPin: GeoPoint? = null
     private var locationName: String? = null
     
     override fun onCreateView(
@@ -41,8 +40,28 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_post_details, container, false)
         mapView = view.findViewById(R.id.mapViewPreview)
-        mapView?.onCreate(savedInstanceState)
-        mapView?.getMapAsync(this)
+        
+        Log.d("MAP_DEBUG", "=== POST DETAILS MAP INIT ===")
+        Log.d("MAP_DEBUG", "MapView found: ${mapView != null}")
+        
+        // Configure osmdroid
+        Configuration.getInstance().load(requireContext(), requireContext().getSharedPreferences("osmdroid", 0))
+        
+        // Set up the map
+        mapView?.setTileSource(TileSourceFactory.MAPNIK)
+        mapView?.setMultiTouchControls(true)
+        mapView?.isTilesScaledToDpi = true
+        
+        // Set initial view to Waterloo campus area
+        mapView?.controller?.setCenter(GeoPoint(43.4723, -80.5449)) // Waterloo campus coordinates
+        mapView?.controller?.setZoom(15.0)
+        
+        // Ensure map is visible
+        mapView?.visibility = View.VISIBLE
+        mapView?.setBackgroundColor(requireContext().getColor(android.R.color.darker_gray))
+        
+        Log.d("MAP_DEBUG", "MapView setup completed")
+        
         return view
     }
     
@@ -140,44 +159,44 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         }
 
         // Debug logging
-        android.util.Log.d("PostDetailsFragment", "Received data - userId: '$userId', userName: '$userName'")
-        android.util.Log.d("PostDetailsFragment", "Arguments: $arguments")
+        Log.d("PostDetailsFragment", "Received data - userId: '$userId', userName: '$userName'")
+        Log.d("PostDetailsFragment", "Arguments: $arguments")
         
         // Check if current user is admin
         val currentUser = FirebaseAuth.getInstance().currentUser
         val isAdmin = currentUser?.email?.endsWith("@admin.watufound.com") == true ||
                      currentUser?.email == "admin@watufound.com"
 
-        android.util.Log.d("PostDetailsFragment", "Current user: ${currentUser?.email}, isAdmin: $isAdmin")
+        Log.d("PostDetailsFragment", "Current user: ${currentUser?.email}, isAdmin: $isAdmin")
 
         // Set Posted By - show actual user name for admins even if posted anonymously
         if (isAnonymous == true && isAdmin) {
             textPostedBy.text = "Anonymous (Posted by: $userName)"
             adminIndicator.visibility = View.VISIBLE
-            android.util.Log.d("PostDetailsFragment", "Showing admin view for anonymous post by: $userName")
+            Log.d("PostDetailsFragment", "Showing admin view for anonymous post by: $userName")
         } else if (isAnonymous == true) {
             textPostedBy.text = "Anonymous"
             adminIndicator.visibility = View.GONE
-            android.util.Log.d("PostDetailsFragment", "Showing regular anonymous view")
+            Log.d("PostDetailsFragment", "Showing regular anonymous view")
         } else {
             textPostedBy.text = userName
             adminIndicator.visibility = View.GONE
-            android.util.Log.d("PostDetailsFragment", "Showing regular user view for: $userName")
+            Log.d("PostDetailsFragment", "Showing regular user view for: $userName")
         }
 
         // Show delete button for admin users, but hide if admin is viewing their own post
         val buttonDeletePost: Button = view.findViewById(R.id.buttonDeletePost)
         if (isAdmin && currentUser?.uid != userId) {
             buttonDeletePost.visibility = View.VISIBLE
-            android.util.Log.d("PostDetailsFragment", "Showing delete button for admin viewing another user's post")
+            Log.d("PostDetailsFragment", "Showing delete button for admin viewing another user's post")
         } else {
             buttonDeletePost.visibility = View.GONE
-            android.util.Log.d("PostDetailsFragment", "Hiding delete button - not admin or admin viewing own post")
+            Log.d("PostDetailsFragment", "Hiding delete button - not admin or admin viewing own post")
         }
 
         // Check if this is the current user's post
         if (currentUser?.uid == userId) {
-            android.util.Log.d("PostDetailsFragment", "This is the current user's post")
+            Log.d("PostDetailsFragment", "This is the current user's post")
             buttonContact.isEnabled = false
             buttonContactText.text = "Your Post"
             buttonContact.setBackgroundResource(R.drawable.contact_button_disabled_background)
@@ -187,7 +206,7 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             chatIcon?.visibility = android.view.View.GONE
             // Action buttons visibility will be handled by the resolved check
         } else {
-            android.util.Log.d("PostDetailsFragment", "This is another user's post")
+            Log.d("PostDetailsFragment", "This is another user's post")
             // Hide action buttons for other users' posts
             layoutActionButtons.visibility = View.GONE
             // Set contact button text to "Start Conversation"
@@ -240,23 +259,27 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         // Format the date/time in the desired format
         textDateTime.text = formatDateTime(dateTime ?: "")
         
+        // Update map with location
+        Log.d("MAP_DEBUG", "About to call updateMapForLocation with locationName: '$locationName'")
+        updateMapForLocation(locationName)
+        
         // Set up contact button
         buttonContact.setOnClickListener {
             val currentUser = FirebaseAuth.getInstance().currentUser
             if (currentUser == null) {
-                android.util.Log.e("PostDetailsFragment", "Contact failed: currentUser is null")
+                Log.e("PostDetailsFragment", "Contact failed: currentUser is null")
                 return@setOnClickListener
             }
             if (userId.isNullOrEmpty()) {
-                android.util.Log.e("PostDetailsFragment", "Contact failed: userId is null or empty")
+                Log.e("PostDetailsFragment", "Contact failed: userId is null or empty")
                 return@setOnClickListener
             }
             if (userName.isNullOrEmpty()) {
-                android.util.Log.e("PostDetailsFragment", "Contact failed: userName is null or empty")
+                Log.e("PostDetailsFragment", "Contact failed: userName is null or empty")
                 return@setOnClickListener
             }
             if (itemTitle.isNullOrEmpty()) {
-                android.util.Log.e("PostDetailsFragment", "Contact failed: itemTitle is null or empty")
+                Log.e("PostDetailsFragment", "Contact failed: itemTitle is null or empty")
                 return@setOnClickListener
             }
             if (currentUser.uid == userId) {
@@ -276,7 +299,7 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             val db = FirebaseDatabase.getInstance().reference
 
             // Debug logging for image URL
-            android.util.Log.d("PostDetailsFragment", "Creating conversation with imageUrl: '$imageUrl'")
+            Log.d("PostDetailsFragment", "Creating conversation with imageUrl: '$imageUrl'")
 
             val userConversationsRef = db.child("userConversations").child(currentUser.uid)
             userConversationsRef.get().addOnSuccessListener { snapshot ->
@@ -356,17 +379,17 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
 
     private fun deletePost(userId: String?, postType: String?, itemTitle: String?) {
         if (userId.isNullOrEmpty() || postType.isNullOrEmpty() || itemTitle.isNullOrEmpty()) {
-            android.util.Log.e("PostDetailsFragment", "Cannot delete post: missing required data")
+            Log.e("PostDetailsFragment", "Cannot delete post: missing required data")
             android.widget.Toast.makeText(requireContext(), "Cannot delete post: missing data", android.widget.Toast.LENGTH_SHORT).show()
             return
         }
 
-        android.util.Log.d("PostDetailsFragment", "Attempting to delete post - userId: $userId, postType: $postType, itemTitle: $itemTitle")
+        Log.d("PostDetailsFragment", "Attempting to delete post - userId: $userId, postType: $postType, itemTitle: $itemTitle")
 
         val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
         val collectionName = if (postType == "lost") "lost_items" else "found_items"
 
-        android.util.Log.d("PostDetailsFragment", "Looking in collection: $collectionName")
+        Log.d("PostDetailsFragment", "Looking in collection: $collectionName")
 
         // Find and delete the post from Firestore
         db.collection(collectionName)
@@ -374,10 +397,10 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
             .whereEqualTo("itemTitle", itemTitle)
             .get()
             .addOnSuccessListener { querySnapshot ->
-                android.util.Log.d("PostDetailsFragment", "Found ${querySnapshot.size()} matching posts")
+                Log.d("PostDetailsFragment", "Found ${querySnapshot.size()} matching posts")
 
                 if (querySnapshot.isEmpty) {
-                    android.util.Log.e("PostDetailsFragment", "No posts found matching criteria")
+                    Log.e("PostDetailsFragment", "No posts found matching criteria")
                     android.widget.Toast.makeText(requireContext(), "Post not found in database", android.widget.Toast.LENGTH_SHORT).show()
                     return@addOnSuccessListener
                 }
@@ -386,17 +409,17 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 val documentToDelete = querySnapshot.documents.first()
                 documentToDelete.reference.delete()
                     .addOnSuccessListener {
-                        android.util.Log.d("PostDetailsFragment", "Post deleted successfully")
+                        Log.d("PostDetailsFragment", "Post deleted successfully")
                         // Navigate back to feed
                         findNavController().navigateUp()
                     }
                     .addOnFailureListener { exception ->
-                        android.util.Log.e("PostDetailsFragment", "Failed to delete post", exception)
+                        Log.e("PostDetailsFragment", "Failed to delete post", exception)
                         android.widget.Toast.makeText(requireContext(), "Failed to delete post: ${exception.message}", android.widget.Toast.LENGTH_SHORT).show()
                     }
             }
             .addOnFailureListener { exception ->
-                android.util.Log.e("PostDetailsFragment", "Failed to find post for deletion", exception)
+                Log.e("PostDetailsFragment", "Failed to find post for deletion", exception)
                 android.widget.Toast.makeText(requireContext(), "Failed to access database: ${exception.message}", android.widget.Toast.LENGTH_SHORT).show()
             }
     }
@@ -417,65 +440,59 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun updateMapForLocation(location: String?) {
+        Log.d("MAP_DEBUG", "updateMapForLocation called with: '$location'")
+        Log.d("MAP_DEBUG", "MapView is null: ${mapView == null}")
+        
         if (location.isNullOrBlank() || location == "Select Location" || location == "Other") {
-            googleMap?.clear()
+            Log.d("MAP_DEBUG", "Location is empty or invalid, clearing map")
+            mapView?.overlays?.clear()
+            mapView?.invalidate()
             return
         }
-        val latLng = BuildingLocationUtils.getBuildingLatLng(requireContext(), location!!)
-        if (latLng != null) {
-            googleMap?.clear()
-            googleMap?.addMarker(MarkerOptions().position(latLng).title(location))
-            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
-            lastPin = latLng
+        
+        val geoPoint = BuildingLocationUtils.getBuildingGeoPoint(requireContext(), location!!)
+        Log.d("MAP_DEBUG", "GeoPoint for '$location': $geoPoint")
+        
+        if (geoPoint != null) {
+            Log.d("MAP_DEBUG", "Setting up marker for location: $location")
+            mapView?.overlays?.clear()
+            val marker = Marker(mapView)
+            marker.position = geoPoint
+            marker.title = location
+            
+            // Create a modern pin appearance
+            marker.icon = requireContext().getDrawable(R.drawable.ic_red_map_pin)
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            
+            mapView?.overlays?.add(marker)
+            mapView?.controller?.setCenter(geoPoint)
+            mapView?.controller?.setZoom(17.0)
+            mapView?.invalidate()
+            lastPin = geoPoint
+            Log.d("MAP_DEBUG", "Map updated successfully")
+        } else {
+            Log.e("PostDetailsFragment", "Could not find coordinates for location: $location")
         }
     }
 
-    override fun onMapReady(map: GoogleMap) {
-        googleMap = map
-        // Enable zoom controls
-        googleMap?.uiSettings?.isZoomControlsEnabled = true
-        
-        // Apply purple theme styling
-        val purpleStyle = """
-            [
-                {
-                    "featureType": "all",
-                    "elementType": "geometry.fill",
-                    "stylers": [
-                        {
-                            "color": "#f3e5f5"
-                        }
-                    ]
-                },
-                {
-                    "featureType": "water",
-                    "elementType": "geometry",
-                    "stylers": [
-                        {
-                            "color": "#e1bee7"
-                        }
-                    ]
-                },
-                {
-                    "featureType": "road",
-                    "elementType": "geometry",
-                    "stylers": [
-                        {
-                            "color": "#f8f0ff"
-                        }
-                    ]
-                }
-            ]
-        """.trimIndent()
-        
-        try {
-            val mapStyleOptions = com.google.android.gms.maps.model.MapStyleOptions(purpleStyle)
-            googleMap?.setMapStyle(mapStyleOptions)
-        } catch (e: Exception) {
-            android.util.Log.e("PostDetailsFragment", "Map styling failed", e)
-        }
-        
-        updateMapForLocation(locationName)
+    override fun onResume() { 
+        super.onResume()
+        mapView?.onResume()
+    }
+    
+    override fun onPause() { 
+        super.onPause()
+        mapView?.onPause()
+    }
+    
+    override fun onDestroyView() { 
+        super.onDestroyView()
+        mapView?.onDetach()
+    }
+    
+    override fun onLowMemory() { 
+        super.onLowMemory()
+        mapView?.onDetach()
     }
 
     private fun checkIfPostIsResolved(postType: String?, itemTitle: String?, userId: String?, dateTimeCreated: String?, callback: (Boolean) -> Unit) {
@@ -545,7 +562,7 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         }
 
         if (itemTitle.isNullOrEmpty() || userId.isNullOrEmpty() || dateTimeCreated.isNullOrEmpty()) {
-            android.util.Log.e("PostDetailsFragment", "Missing required data for resolve")
+            Log.e("PostDetailsFragment", "Missing required data for resolve")
             return
         }
 
@@ -559,12 +576,12 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 val document = documents.documents[0]
                 document.reference.update("isResolved", true)
                     .addOnSuccessListener {
-                        android.util.Log.d("PostDetailsFragment", "Post resolved successfully")
+                        Log.d("PostDetailsFragment", "Post resolved successfully")
                         // Navigate back to home
                         findNavController().navigateUp()
                     }
                     .addOnFailureListener { e ->
-                        android.util.Log.e("PostDetailsFragment", "Error resolving post", e)
+                        Log.e("PostDetailsFragment", "Error resolving post", e)
                     }
             }
         }
@@ -579,7 +596,7 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
         }
 
         if (itemTitle.isNullOrEmpty() || userId.isNullOrEmpty() || dateTimeCreated.isNullOrEmpty()) {
-            android.util.Log.e("PostDetailsFragment", "Missing required data for delete")
+            Log.e("PostDetailsFragment", "Missing required data for delete")
             return
         }
 
@@ -594,19 +611,14 @@ class PostDetailsFragment : Fragment(), OnMapReadyCallback {
                 // Soft delete by setting isDeleted to true
                 document.reference.update("isDeleted", true)
                     .addOnSuccessListener {
-                        android.util.Log.d("PostDetailsFragment", "Post soft deleted successfully")
+                        Log.d("PostDetailsFragment", "Post soft deleted successfully")
                         // Navigate back to home
                         findNavController().navigateUp()
                     }
                     .addOnFailureListener { e ->
-                        android.util.Log.e("PostDetailsFragment", "Error soft deleting post", e)
+                        Log.e("PostDetailsFragment", "Error soft deleting post", e)
                     }
             }
         }
     }
-
-    override fun onResume() { super.onResume(); mapView?.onResume() }
-    override fun onPause() { super.onPause(); mapView?.onPause() }
-    override fun onDestroyView() { super.onDestroyView(); mapView?.onDestroy() }
-    override fun onLowMemory() { super.onLowMemory(); mapView?.onLowMemory() }
 } 
