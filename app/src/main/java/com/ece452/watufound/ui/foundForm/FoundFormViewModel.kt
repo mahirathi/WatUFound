@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 import android.net.Uri
 import com.google.firebase.storage.FirebaseStorage
+import java.util.UUID
 
 class FoundFormViewModel : ViewModel() {
 
@@ -49,7 +50,7 @@ class FoundFormViewModel : ViewModel() {
 
                 if (imageUri != null) {
                     // Upload image to Firebase Storage
-                    val imageRef = storage.reference.child("gs://ece452-watufound.firebasestorage.app")
+                    val imageRef = storage.reference.child("/found_images/${UUID.randomUUID()}.jpg")
                     imageRef.putFile(imageUri)
                         .addOnSuccessListener { taskSnapshot ->
                             imageRef.downloadUrl.addOnSuccessListener { uri ->
