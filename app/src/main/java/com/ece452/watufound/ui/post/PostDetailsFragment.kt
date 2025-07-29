@@ -231,7 +231,7 @@ class PostDetailsFragment : Fragment() {
                 tagStatus.setBackgroundResource(R.drawable.tag_found_bg)
                 tagStatus.setTextColor(requireContext().getColor(R.color.found_text))
                 toolbar.title = "Found Item Details"
-                labelDateTime.text = "Time Posted"
+                labelDateTime.text = "Reported Found at"
             }
         }
         
