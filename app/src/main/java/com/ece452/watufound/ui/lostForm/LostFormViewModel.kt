@@ -14,7 +14,7 @@ class LostFormViewModel : ViewModel() {
     private val db = Firebase.firestore
     private val storage = FirebaseStorage.getInstance()
 
-    fun submitLostItem(item: LostItem, imageUri: Uri? = null, onBanned: () -> Unit = {}) {
+    fun submitLostItem(item: LostItem, imageUri: Uri? = null, onBanned: () -> Unit = {}, onSuccess: () -> Unit = {}) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser == null) {
             Log.e("LostFormVM", "No authenticated user")
@@ -54,16 +54,16 @@ class LostFormViewModel : ViewModel() {
                         .addOnSuccessListener { taskSnapshot ->
                             imageRef.downloadUrl.addOnSuccessListener { uri ->
                                 post["imageUrl"] = uri.toString()
-                                saveLostItem(post)
+                                saveLostItem(post, onSuccess)
                             }
                         }
                         .addOnFailureListener { e ->
                             Log.w("LostFormVM", "Image upload failed", e)
                             // Save post without image if upload fails
-                            saveLostItem(post)
+                            saveLostItem(post, onSuccess)
                         }
                 } else {
-                    saveLostItem(post)
+                    saveLostItem(post, onSuccess)
                 }
             }
             .addOnFailureListener { exception ->
@@ -71,7 +71,7 @@ class LostFormViewModel : ViewModel() {
             }
     }
 
-    private fun saveLostItem(post: Any) {
+    private fun saveLostItem(post: Any, onSuccess: () -> Unit = {}) {
         db.collection("lost_items")
             .add(post)
             .addOnSuccessListener {
@@ -99,6 +99,9 @@ class LostFormViewModel : ViewModel() {
                             Log.w("LostFormVM", "Failed to add post ID to lostPosts array", e)
                         }
                 }
+                
+                // Call onSuccess callback after post is saved
+                onSuccess()
             }
             .addOnFailureListener { e ->
                 Log.w("LostFormVM", "Failed to post item", e)

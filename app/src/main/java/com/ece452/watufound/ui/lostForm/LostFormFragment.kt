@@ -215,12 +215,15 @@ class LostFormFragment : Fragment() {
                 onBanned = {
                     // Handle banned user
 //                    Toast.makeText(requireContext(), "You are banned from posting. Please contact an administrator.", Toast.LENGTH_LONG).show()
+                },
+                onSuccess = {
+                    // Post was successfully saved, now navigate back to feed
+                    Toast.makeText(requireContext(), "Posting your lost item...", Toast.LENGTH_SHORT).show()
+                    clearForm()
+                    // Navigate back to feed and ensure it refreshes
+                    findNavController().popBackStack(R.id.navigation_feed, false)
                 }
             )
-
-            Toast.makeText(requireContext(), "Posting your lost item...", Toast.LENGTH_SHORT).show()
-            clearForm()
-            findNavController().navigate(R.id.navigation_feed)
         }
 
         binding.lastSeenAtInput.setOnFocusChangeListener { view, hasFocus ->

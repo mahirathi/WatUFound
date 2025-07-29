@@ -209,20 +209,12 @@ class PostDetailsFragment : Fragment() {
             Log.d("PostDetailsFragment", "This is another user's post")
             // Hide action buttons for other users' posts
             layoutActionButtons.visibility = View.GONE
-            // Set contact button text to "Start Conversation"
+            // Always set contact button text to "Start Conversation"
             buttonContactText.text = "Start Conversation"
 
             // Show the chat icon for "Start Conversation" button
             val chatIcon = buttonContact.findViewById<android.widget.ImageView>(R.id.chatIcon)
             chatIcon?.visibility = android.view.View.VISIBLE
-            // Set contact button text based on anonymity and admin status
-            if (isAnonymous == true && isAdmin) {
-                buttonContactText.text = "Contact $userName"
-            } else if (isAnonymous == true) {
-                buttonContactText.text = "Contact Anonymous"
-            } else {
-                buttonContactText.text = "Contact $userName"
-            }
         }
         
         // Populate data based on post type

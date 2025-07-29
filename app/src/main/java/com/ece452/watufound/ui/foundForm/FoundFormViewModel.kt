@@ -14,7 +14,7 @@ class FoundFormViewModel : ViewModel() {
     private val db = Firebase.firestore
     private val storage = FirebaseStorage.getInstance()
 
-    fun submitFoundItem(item: FoundItem, imageUri: Uri? = null, onBanned: () -> Unit = {}) {
+    fun submitFoundItem(item: FoundItem, imageUri: Uri? = null, onBanned: () -> Unit = {}, onSuccess: () -> Unit = {}) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser == null) {
             Log.e("FoundFormVM", "No authenticated user")
@@ -54,16 +54,16 @@ class FoundFormViewModel : ViewModel() {
                         .addOnSuccessListener { taskSnapshot ->
                             imageRef.downloadUrl.addOnSuccessListener { uri ->
                                 post["imageUrl"] = uri.toString()
-                                saveFoundItem(post)
+                                saveFoundItem(post, onSuccess)
                             }
                         }
                         .addOnFailureListener { e ->
                             Log.w("FoundFormVM", "Image upload failed", e)
                             // Save post without image if upload fails
-                            saveFoundItem(post)
+                            saveFoundItem(post, onSuccess)
                         }
                 } else {
-                    saveFoundItem(post)
+                    saveFoundItem(post, onSuccess)
                 }
             }
             .addOnFailureListener { exception ->
@@ -71,7 +71,7 @@ class FoundFormViewModel : ViewModel() {
             }
     }
 
-    private fun saveFoundItem(post: Any) {
+    private fun saveFoundItem(post: Any, onSuccess: () -> Unit = {}) {
         db.collection("found_items")
             .add(post)
             .addOnSuccessListener {
@@ -99,6 +99,9 @@ class FoundFormViewModel : ViewModel() {
                             Log.w("FoundFormVM", "Failed to add post ID to foundPosts array", e)
                         }
                 }
+                
+                // Call onSuccess callback after post is saved
+                onSuccess()
             }
             .addOnFailureListener { e ->
                 Log.w("FoundFormVM", "Failed to post found item", e)

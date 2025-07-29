@@ -219,12 +219,15 @@ class FoundFormFragment : Fragment() {
                 onBanned = {
                     // Handle banned user
 //                    Toast.makeText(requireContext(), "You are banned from posting. Please contact an administrator.", Toast.LENGTH_LONG).show()
+                },
+                onSuccess = {
+                    // Post was successfully saved, now navigate back to feed
+                    Toast.makeText(requireContext(), "Posting your found item...", Toast.LENGTH_SHORT).show()
+                    clearForm()
+                    // Navigate back to feed and ensure it refreshes
+                    findNavController().popBackStack(R.id.navigation_feed, false)
                 }
             )
-
-            Toast.makeText(requireContext(), "Posting your found item...", Toast.LENGTH_SHORT).show()
-            clearForm()
-            findNavController().navigate(R.id.navigation_feed)
         }
     }
 
@@ -240,11 +243,15 @@ class FoundFormFragment : Fragment() {
                 val selectedCategory = parent.getItemAtPosition(position).toString()
 
                 if (CategoryUtils.isImageRestricted(selectedCategory)) {
-                    binding.buttonSelectImage.isEnabled = false
+                    // Hide the entire photo upload section for restricted categories
+                    binding.imagePreview.visibility = View.GONE
+                    binding.buttonSelectImage.visibility = View.GONE
                     selectedImageUri = null
-                    binding.imagePreview.setImageResource(R.drawable.ic_image_upload)
-                    Toast.makeText(requireContext(), "Image upload disabled for $selectedCategory due to security reasons.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Photo upload section hidden for $selectedCategory due to privacy concerns.", Toast.LENGTH_SHORT).show()
                 } else {
+                    // Show the photo upload section for non-restricted categories
+                    binding.imagePreview.visibility = View.VISIBLE
+                    binding.buttonSelectImage.visibility = View.VISIBLE
                     binding.buttonSelectImage.isEnabled = true
                 }
             }
@@ -393,6 +400,11 @@ class FoundFormFragment : Fragment() {
         binding.roomNumberInput.text?.clear()
         selectedImageUri = null
         binding.imagePreview.setImageResource(R.drawable.ic_image_upload)
+        
+        // Ensure photo upload section is visible when form is cleared
+        binding.imagePreview.visibility = View.VISIBLE
+        binding.buttonSelectImage.visibility = View.VISIBLE
+        binding.buttonSelectImage.isEnabled = true
     }
 
     // Helper function to get month name

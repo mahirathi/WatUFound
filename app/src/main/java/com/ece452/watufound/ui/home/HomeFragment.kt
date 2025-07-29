@@ -422,7 +422,10 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         // Refresh the feed when returning to this fragment (e.g., after creating a post)
-        homeViewModel.refreshPosts()
+        // Add a small delay to ensure any pending database operations are completed
+        binding.root.postDelayed({
+            homeViewModel.refreshPosts()
+        }, 500) // 500ms delay
     }
 
     private fun highlightFilterButton(selected: android.widget.TextView) {
